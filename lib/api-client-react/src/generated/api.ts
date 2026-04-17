@@ -18,6 +18,7 @@ import type {
 
 import type {
   AddToCartBody,
+  AdminListInventoryTransactionsParams,
   AdminListOrdersParams,
   AuthResponse,
   CartWithItems,
@@ -26,13 +27,20 @@ import type {
   CategoryOrderCount,
   ContactBody,
   ContactMessage,
+  CreateGalleryItemBody,
   CreateOrderBody,
+  CreateSnackCategoryBody,
   DashboardStats,
   DeliveryArea,
   DeliveryAreaBody,
   ErrorResponse,
+  GalleryItem,
   HealthStatus,
+  Inventory,
+  InventoryTransaction,
+  InventoryTransactionBody,
   ListProductsParams,
+  ListSnacksParams,
   LoginBody,
   OrderTrack,
   OrderWithItems,
@@ -41,9 +49,14 @@ import type {
   RegisterBody,
   Settings,
   SettingsBody,
+  Snack,
+  SnackBody,
+  SnackCategory,
   SuccessResponse,
   UpdateCartItemBody,
+  UpdateGalleryItemBody,
   UpdateOrderStatusBody,
+  UpdateSnackCategoryBody,
   User,
   WeeklyRevenuePoint,
 } from "./api.schemas";
@@ -3019,6 +3032,413 @@ export function useAdminListContactMessages<
 }
 
 /**
+ * @summary List published gallery items
+ */
+export const getListGalleryItemsUrl = () => {
+  return `/api/gallery`;
+};
+
+export const listGalleryItems = async (
+  options?: RequestInit,
+): Promise<GalleryItem[]> => {
+  return customFetch<GalleryItem[]>(getListGalleryItemsUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getListGalleryItemsQueryKey = () => {
+  return [`/api/gallery`] as const;
+};
+
+export const getListGalleryItemsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listGalleryItems>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof listGalleryItems>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListGalleryItemsQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listGalleryItems>>
+  > = ({ signal }) => listGalleryItems({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listGalleryItems>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListGalleryItemsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listGalleryItems>>
+>;
+export type ListGalleryItemsQueryError = ErrorType<unknown>;
+
+/**
+ * @summary List published gallery items
+ */
+
+export function useListGalleryItems<
+  TData = Awaited<ReturnType<typeof listGalleryItems>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof listGalleryItems>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListGalleryItemsQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Admin - list all gallery items
+ */
+export const getAdminListGalleryItemsUrl = () => {
+  return `/api/admin/gallery`;
+};
+
+export const adminListGalleryItems = async (
+  options?: RequestInit,
+): Promise<GalleryItem[]> => {
+  return customFetch<GalleryItem[]>(getAdminListGalleryItemsUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getAdminListGalleryItemsQueryKey = () => {
+  return [`/api/admin/gallery`] as const;
+};
+
+export const getAdminListGalleryItemsQueryOptions = <
+  TData = Awaited<ReturnType<typeof adminListGalleryItems>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof adminListGalleryItems>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getAdminListGalleryItemsQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof adminListGalleryItems>>
+  > = ({ signal }) => adminListGalleryItems({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof adminListGalleryItems>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type AdminListGalleryItemsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof adminListGalleryItems>>
+>;
+export type AdminListGalleryItemsQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Admin - list all gallery items
+ */
+
+export function useAdminListGalleryItems<
+  TData = Awaited<ReturnType<typeof adminListGalleryItems>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof adminListGalleryItems>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getAdminListGalleryItemsQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Admin - create gallery item
+ */
+export const getCreateGalleryItemUrl = () => {
+  return `/api/admin/gallery`;
+};
+
+export const createGalleryItem = async (
+  createGalleryItemBody: CreateGalleryItemBody,
+  options?: RequestInit,
+): Promise<GalleryItem> => {
+  return customFetch<GalleryItem>(getCreateGalleryItemUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(createGalleryItemBody),
+  });
+};
+
+export const getCreateGalleryItemMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createGalleryItem>>,
+    TError,
+    { data: BodyType<CreateGalleryItemBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createGalleryItem>>,
+  TError,
+  { data: BodyType<CreateGalleryItemBody> },
+  TContext
+> => {
+  const mutationKey = ["createGalleryItem"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createGalleryItem>>,
+    { data: BodyType<CreateGalleryItemBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createGalleryItem(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateGalleryItemMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createGalleryItem>>
+>;
+export type CreateGalleryItemMutationBody = BodyType<CreateGalleryItemBody>;
+export type CreateGalleryItemMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Admin - create gallery item
+ */
+export const useCreateGalleryItem = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createGalleryItem>>,
+    TError,
+    { data: BodyType<CreateGalleryItemBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof createGalleryItem>>,
+  TError,
+  { data: BodyType<CreateGalleryItemBody> },
+  TContext
+> => {
+  return useMutation(getCreateGalleryItemMutationOptions(options));
+};
+
+/**
+ * @summary Admin - update gallery item
+ */
+export const getUpdateGalleryItemUrl = (id: number) => {
+  return `/api/admin/gallery/${id}`;
+};
+
+export const updateGalleryItem = async (
+  id: number,
+  updateGalleryItemBody: UpdateGalleryItemBody,
+  options?: RequestInit,
+): Promise<GalleryItem> => {
+  return customFetch<GalleryItem>(getUpdateGalleryItemUrl(id), {
+    ...options,
+    method: "PUT",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(updateGalleryItemBody),
+  });
+};
+
+export const getUpdateGalleryItemMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateGalleryItem>>,
+    TError,
+    { id: number; data: BodyType<UpdateGalleryItemBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateGalleryItem>>,
+  TError,
+  { id: number; data: BodyType<UpdateGalleryItemBody> },
+  TContext
+> => {
+  const mutationKey = ["updateGalleryItem"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateGalleryItem>>,
+    { id: number; data: BodyType<UpdateGalleryItemBody> }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return updateGalleryItem(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateGalleryItemMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateGalleryItem>>
+>;
+export type UpdateGalleryItemMutationBody = BodyType<UpdateGalleryItemBody>;
+export type UpdateGalleryItemMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Admin - update gallery item
+ */
+export const useUpdateGalleryItem = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateGalleryItem>>,
+    TError,
+    { id: number; data: BodyType<UpdateGalleryItemBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof updateGalleryItem>>,
+  TError,
+  { id: number; data: BodyType<UpdateGalleryItemBody> },
+  TContext
+> => {
+  return useMutation(getUpdateGalleryItemMutationOptions(options));
+};
+
+/**
+ * @summary Admin - soft delete gallery item
+ */
+export const getDeleteGalleryItemUrl = (id: number) => {
+  return `/api/admin/gallery/${id}`;
+};
+
+export const deleteGalleryItem = async (
+  id: number,
+  options?: RequestInit,
+): Promise<SuccessResponse> => {
+  return customFetch<SuccessResponse>(getDeleteGalleryItemUrl(id), {
+    ...options,
+    method: "DELETE",
+  });
+};
+
+export const getDeleteGalleryItemMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteGalleryItem>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteGalleryItem>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  const mutationKey = ["deleteGalleryItem"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteGalleryItem>>,
+    { id: number }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return deleteGalleryItem(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteGalleryItemMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteGalleryItem>>
+>;
+
+export type DeleteGalleryItemMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Admin - soft delete gallery item
+ */
+export const useDeleteGalleryItem = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteGalleryItem>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof deleteGalleryItem>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  return useMutation(getDeleteGalleryItemMutationOptions(options));
+};
+
+/**
  * @summary Admin - get dashboard statistics
  */
 export const getGetDashboardStatsUrl = () => {
@@ -3242,3 +3662,1277 @@ export function useGetOrdersByCategory<
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+/**
+ * @summary List active snack categories (store filters)
+ */
+export const getListSnackCategoriesUrl = () => {
+  return `/api/snack-categories`;
+};
+
+export const listSnackCategories = async (
+  options?: RequestInit,
+): Promise<SnackCategory[]> => {
+  return customFetch<SnackCategory[]>(getListSnackCategoriesUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getListSnackCategoriesQueryKey = () => {
+  return [`/api/snack-categories`] as const;
+};
+
+export const getListSnackCategoriesQueryOptions = <
+  TData = Awaited<ReturnType<typeof listSnackCategories>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof listSnackCategories>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListSnackCategoriesQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listSnackCategories>>
+  > = ({ signal }) => listSnackCategories({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listSnackCategories>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListSnackCategoriesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listSnackCategories>>
+>;
+export type ListSnackCategoriesQueryError = ErrorType<unknown>;
+
+/**
+ * @summary List active snack categories (store filters)
+ */
+
+export function useListSnackCategories<
+  TData = Awaited<ReturnType<typeof listSnackCategories>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof listSnackCategories>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListSnackCategoriesQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Admin - list all snack categories
+ */
+export const getAdminListSnackCategoriesUrl = () => {
+  return `/api/admin/snack-categories`;
+};
+
+export const adminListSnackCategories = async (
+  options?: RequestInit,
+): Promise<SnackCategory[]> => {
+  return customFetch<SnackCategory[]>(getAdminListSnackCategoriesUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getAdminListSnackCategoriesQueryKey = () => {
+  return [`/api/admin/snack-categories`] as const;
+};
+
+export const getAdminListSnackCategoriesQueryOptions = <
+  TData = Awaited<ReturnType<typeof adminListSnackCategories>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof adminListSnackCategories>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getAdminListSnackCategoriesQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof adminListSnackCategories>>
+  > = ({ signal }) => adminListSnackCategories({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof adminListSnackCategories>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type AdminListSnackCategoriesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof adminListSnackCategories>>
+>;
+export type AdminListSnackCategoriesQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Admin - list all snack categories
+ */
+
+export function useAdminListSnackCategories<
+  TData = Awaited<ReturnType<typeof adminListSnackCategories>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof adminListSnackCategories>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getAdminListSnackCategoriesQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Admin - create snack category
+ */
+export const getCreateSnackCategoryUrl = () => {
+  return `/api/admin/snack-categories`;
+};
+
+export const createSnackCategory = async (
+  createSnackCategoryBody: CreateSnackCategoryBody,
+  options?: RequestInit,
+): Promise<SnackCategory> => {
+  return customFetch<SnackCategory>(getCreateSnackCategoryUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(createSnackCategoryBody),
+  });
+};
+
+export const getCreateSnackCategoryMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createSnackCategory>>,
+    TError,
+    { data: BodyType<CreateSnackCategoryBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createSnackCategory>>,
+  TError,
+  { data: BodyType<CreateSnackCategoryBody> },
+  TContext
+> => {
+  const mutationKey = ["createSnackCategory"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createSnackCategory>>,
+    { data: BodyType<CreateSnackCategoryBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createSnackCategory(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateSnackCategoryMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createSnackCategory>>
+>;
+export type CreateSnackCategoryMutationBody = BodyType<CreateSnackCategoryBody>;
+export type CreateSnackCategoryMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Admin - create snack category
+ */
+export const useCreateSnackCategory = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createSnackCategory>>,
+    TError,
+    { data: BodyType<CreateSnackCategoryBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof createSnackCategory>>,
+  TError,
+  { data: BodyType<CreateSnackCategoryBody> },
+  TContext
+> => {
+  return useMutation(getCreateSnackCategoryMutationOptions(options));
+};
+
+/**
+ * @summary Admin - update snack category
+ */
+export const getUpdateSnackCategoryUrl = (id: number) => {
+  return `/api/admin/snack-categories/${id}`;
+};
+
+export const updateSnackCategory = async (
+  id: number,
+  updateSnackCategoryBody: UpdateSnackCategoryBody,
+  options?: RequestInit,
+): Promise<SnackCategory> => {
+  return customFetch<SnackCategory>(getUpdateSnackCategoryUrl(id), {
+    ...options,
+    method: "PUT",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(updateSnackCategoryBody),
+  });
+};
+
+export const getUpdateSnackCategoryMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateSnackCategory>>,
+    TError,
+    { id: number; data: BodyType<UpdateSnackCategoryBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateSnackCategory>>,
+  TError,
+  { id: number; data: BodyType<UpdateSnackCategoryBody> },
+  TContext
+> => {
+  const mutationKey = ["updateSnackCategory"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateSnackCategory>>,
+    { id: number; data: BodyType<UpdateSnackCategoryBody> }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return updateSnackCategory(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateSnackCategoryMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateSnackCategory>>
+>;
+export type UpdateSnackCategoryMutationBody = BodyType<UpdateSnackCategoryBody>;
+export type UpdateSnackCategoryMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Admin - update snack category
+ */
+export const useUpdateSnackCategory = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateSnackCategory>>,
+    TError,
+    { id: number; data: BodyType<UpdateSnackCategoryBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof updateSnackCategory>>,
+  TError,
+  { id: number; data: BodyType<UpdateSnackCategoryBody> },
+  TContext
+> => {
+  return useMutation(getUpdateSnackCategoryMutationOptions(options));
+};
+
+/**
+ * @summary Admin - soft delete snack category
+ */
+export const getDeleteSnackCategoryUrl = (id: number) => {
+  return `/api/admin/snack-categories/${id}`;
+};
+
+export const deleteSnackCategory = async (
+  id: number,
+  options?: RequestInit,
+): Promise<SuccessResponse> => {
+  return customFetch<SuccessResponse>(getDeleteSnackCategoryUrl(id), {
+    ...options,
+    method: "DELETE",
+  });
+};
+
+export const getDeleteSnackCategoryMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteSnackCategory>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteSnackCategory>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  const mutationKey = ["deleteSnackCategory"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteSnackCategory>>,
+    { id: number }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return deleteSnackCategory(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteSnackCategoryMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteSnackCategory>>
+>;
+
+export type DeleteSnackCategoryMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Admin - soft delete snack category
+ */
+export const useDeleteSnackCategory = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteSnackCategory>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof deleteSnackCategory>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  return useMutation(getDeleteSnackCategoryMutationOptions(options));
+};
+
+/**
+ * @summary List active snacks
+ */
+export const getListSnacksUrl = (params?: ListSnacksParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/snacks?${stringifiedParams}`
+    : `/api/snacks`;
+};
+
+export const listSnacks = async (
+  params?: ListSnacksParams,
+  options?: RequestInit,
+): Promise<Snack[]> => {
+  return customFetch<Snack[]>(getListSnacksUrl(params), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getListSnacksQueryKey = (params?: ListSnacksParams) => {
+  return [`/api/snacks`, ...(params ? [params] : [])] as const;
+};
+
+export const getListSnacksQueryOptions = <
+  TData = Awaited<ReturnType<typeof listSnacks>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: ListSnacksParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listSnacks>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListSnacksQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof listSnacks>>> = ({
+    signal,
+  }) => listSnacks(params, { signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listSnacks>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListSnacksQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listSnacks>>
+>;
+export type ListSnacksQueryError = ErrorType<unknown>;
+
+/**
+ * @summary List active snacks
+ */
+
+export function useListSnacks<
+  TData = Awaited<ReturnType<typeof listSnacks>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: ListSnacksParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listSnacks>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListSnacksQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Get a snack by ID
+ */
+export const getGetSnackUrl = (id: number) => {
+  return `/api/snacks/${id}`;
+};
+
+export const getSnack = async (
+  id: number,
+  options?: RequestInit,
+): Promise<Snack> => {
+  return customFetch<Snack>(getGetSnackUrl(id), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetSnackQueryKey = (id: number) => {
+  return [`/api/snacks/${id}`] as const;
+};
+
+export const getGetSnackQueryOptions = <
+  TData = Awaited<ReturnType<typeof getSnack>>,
+  TError = ErrorType<unknown>,
+>(
+  id: number,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getSnack>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetSnackQueryKey(id);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getSnack>>> = ({
+    signal,
+  }) => getSnack(id, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!id,
+    ...queryOptions,
+  } as UseQueryOptions<Awaited<ReturnType<typeof getSnack>>, TError, TData> & {
+    queryKey: QueryKey;
+  };
+};
+
+export type GetSnackQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getSnack>>
+>;
+export type GetSnackQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Get a snack by ID
+ */
+
+export function useGetSnack<
+  TData = Awaited<ReturnType<typeof getSnack>>,
+  TError = ErrorType<unknown>,
+>(
+  id: number,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getSnack>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetSnackQueryOptions(id, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Admin - list all snacks
+ */
+export const getAdminListSnacksUrl = () => {
+  return `/api/admin/snacks`;
+};
+
+export const adminListSnacks = async (
+  options?: RequestInit,
+): Promise<Snack[]> => {
+  return customFetch<Snack[]>(getAdminListSnacksUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getAdminListSnacksQueryKey = () => {
+  return [`/api/admin/snacks`] as const;
+};
+
+export const getAdminListSnacksQueryOptions = <
+  TData = Awaited<ReturnType<typeof adminListSnacks>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof adminListSnacks>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getAdminListSnacksQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof adminListSnacks>>> = ({
+    signal,
+  }) => adminListSnacks({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof adminListSnacks>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type AdminListSnacksQueryResult = NonNullable<
+  Awaited<ReturnType<typeof adminListSnacks>>
+>;
+export type AdminListSnacksQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Admin - list all snacks
+ */
+
+export function useAdminListSnacks<
+  TData = Awaited<ReturnType<typeof adminListSnacks>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof adminListSnacks>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getAdminListSnacksQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Admin - create snack
+ */
+export const getCreateSnackUrl = () => {
+  return `/api/admin/snacks`;
+};
+
+export const createSnack = async (
+  snackBody: SnackBody,
+  options?: RequestInit,
+): Promise<Snack> => {
+  return customFetch<Snack>(getCreateSnackUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(snackBody),
+  });
+};
+
+export const getCreateSnackMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createSnack>>,
+    TError,
+    { data: BodyType<SnackBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createSnack>>,
+  TError,
+  { data: BodyType<SnackBody> },
+  TContext
+> => {
+  const mutationKey = ["createSnack"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createSnack>>,
+    { data: BodyType<SnackBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createSnack(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateSnackMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createSnack>>
+>;
+export type CreateSnackMutationBody = BodyType<SnackBody>;
+export type CreateSnackMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Admin - create snack
+ */
+export const useCreateSnack = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createSnack>>,
+    TError,
+    { data: BodyType<SnackBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof createSnack>>,
+  TError,
+  { data: BodyType<SnackBody> },
+  TContext
+> => {
+  return useMutation(getCreateSnackMutationOptions(options));
+};
+
+/**
+ * @summary Admin - update snack
+ */
+export const getUpdateSnackUrl = (id: number) => {
+  return `/api/admin/snacks/${id}`;
+};
+
+export const updateSnack = async (
+  id: number,
+  snackBody: SnackBody,
+  options?: RequestInit,
+): Promise<Snack> => {
+  return customFetch<Snack>(getUpdateSnackUrl(id), {
+    ...options,
+    method: "PUT",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(snackBody),
+  });
+};
+
+export const getUpdateSnackMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateSnack>>,
+    TError,
+    { id: number; data: BodyType<SnackBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateSnack>>,
+  TError,
+  { id: number; data: BodyType<SnackBody> },
+  TContext
+> => {
+  const mutationKey = ["updateSnack"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateSnack>>,
+    { id: number; data: BodyType<SnackBody> }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return updateSnack(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateSnackMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateSnack>>
+>;
+export type UpdateSnackMutationBody = BodyType<SnackBody>;
+export type UpdateSnackMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Admin - update snack
+ */
+export const useUpdateSnack = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateSnack>>,
+    TError,
+    { id: number; data: BodyType<SnackBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof updateSnack>>,
+  TError,
+  { id: number; data: BodyType<SnackBody> },
+  TContext
+> => {
+  return useMutation(getUpdateSnackMutationOptions(options));
+};
+
+/**
+ * @summary Admin - soft delete snack
+ */
+export const getDeleteSnackUrl = (id: number) => {
+  return `/api/admin/snacks/${id}`;
+};
+
+export const deleteSnack = async (
+  id: number,
+  options?: RequestInit,
+): Promise<SuccessResponse> => {
+  return customFetch<SuccessResponse>(getDeleteSnackUrl(id), {
+    ...options,
+    method: "DELETE",
+  });
+};
+
+export const getDeleteSnackMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteSnack>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteSnack>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  const mutationKey = ["deleteSnack"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteSnack>>,
+    { id: number }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return deleteSnack(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteSnackMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteSnack>>
+>;
+
+export type DeleteSnackMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Admin - soft delete snack
+ */
+export const useDeleteSnack = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteSnack>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof deleteSnack>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  return useMutation(getDeleteSnackMutationOptions(options));
+};
+
+/**
+ * @summary Admin - toggle snack active/inactive
+ */
+export const getToggleSnackStatusUrl = (id: number) => {
+  return `/api/admin/snacks/${id}/toggle`;
+};
+
+export const toggleSnackStatus = async (
+  id: number,
+  options?: RequestInit,
+): Promise<Snack> => {
+  return customFetch<Snack>(getToggleSnackStatusUrl(id), {
+    ...options,
+    method: "PATCH",
+  });
+};
+
+export const getToggleSnackStatusMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof toggleSnackStatus>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof toggleSnackStatus>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  const mutationKey = ["toggleSnackStatus"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof toggleSnackStatus>>,
+    { id: number }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return toggleSnackStatus(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ToggleSnackStatusMutationResult = NonNullable<
+  Awaited<ReturnType<typeof toggleSnackStatus>>
+>;
+
+export type ToggleSnackStatusMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Admin - toggle snack active/inactive
+ */
+export const useToggleSnackStatus = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof toggleSnackStatus>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof toggleSnackStatus>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  return useMutation(getToggleSnackStatusMutationOptions(options));
+};
+
+/**
+ * @summary Admin - list current inventory level of all snacks
+ */
+export const getAdminListInventoryUrl = () => {
+  return `/api/admin/inventory`;
+};
+
+export const adminListInventory = async (
+  options?: RequestInit,
+): Promise<Inventory[]> => {
+  return customFetch<Inventory[]>(getAdminListInventoryUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getAdminListInventoryQueryKey = () => {
+  return [`/api/admin/inventory`] as const;
+};
+
+export const getAdminListInventoryQueryOptions = <
+  TData = Awaited<ReturnType<typeof adminListInventory>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof adminListInventory>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getAdminListInventoryQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof adminListInventory>>
+  > = ({ signal }) => adminListInventory({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof adminListInventory>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type AdminListInventoryQueryResult = NonNullable<
+  Awaited<ReturnType<typeof adminListInventory>>
+>;
+export type AdminListInventoryQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Admin - list current inventory level of all snacks
+ */
+
+export function useAdminListInventory<
+  TData = Awaited<ReturnType<typeof adminListInventory>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof adminListInventory>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getAdminListInventoryQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Admin - list inventory transactions
+ */
+export const getAdminListInventoryTransactionsUrl = (
+  params?: AdminListInventoryTransactionsParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/admin/inventory/transactions?${stringifiedParams}`
+    : `/api/admin/inventory/transactions`;
+};
+
+export const adminListInventoryTransactions = async (
+  params?: AdminListInventoryTransactionsParams,
+  options?: RequestInit,
+): Promise<InventoryTransaction[]> => {
+  return customFetch<InventoryTransaction[]>(
+    getAdminListInventoryTransactionsUrl(params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+export const getAdminListInventoryTransactionsQueryKey = (
+  params?: AdminListInventoryTransactionsParams,
+) => {
+  return [
+    `/api/admin/inventory/transactions`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getAdminListInventoryTransactionsQueryOptions = <
+  TData = Awaited<ReturnType<typeof adminListInventoryTransactions>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: AdminListInventoryTransactionsParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof adminListInventoryTransactions>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getAdminListInventoryTransactionsQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof adminListInventoryTransactions>>
+  > = ({ signal }) =>
+    adminListInventoryTransactions(params, { signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof adminListInventoryTransactions>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type AdminListInventoryTransactionsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof adminListInventoryTransactions>>
+>;
+export type AdminListInventoryTransactionsQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Admin - list inventory transactions
+ */
+
+export function useAdminListInventoryTransactions<
+  TData = Awaited<ReturnType<typeof adminListInventoryTransactions>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: AdminListInventoryTransactionsParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof adminListInventoryTransactions>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getAdminListInventoryTransactionsQueryOptions(
+    params,
+    options,
+  );
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Admin - create inventory transaction (add, sale, adjustment)
+ */
+export const getCreateInventoryTransactionUrl = () => {
+  return `/api/admin/inventory/transactions`;
+};
+
+export const createInventoryTransaction = async (
+  inventoryTransactionBody: InventoryTransactionBody,
+  options?: RequestInit,
+): Promise<InventoryTransaction> => {
+  return customFetch<InventoryTransaction>(getCreateInventoryTransactionUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(inventoryTransactionBody),
+  });
+};
+
+export const getCreateInventoryTransactionMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createInventoryTransaction>>,
+    TError,
+    { data: BodyType<InventoryTransactionBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createInventoryTransaction>>,
+  TError,
+  { data: BodyType<InventoryTransactionBody> },
+  TContext
+> => {
+  const mutationKey = ["createInventoryTransaction"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createInventoryTransaction>>,
+    { data: BodyType<InventoryTransactionBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createInventoryTransaction(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateInventoryTransactionMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createInventoryTransaction>>
+>;
+export type CreateInventoryTransactionMutationBody =
+  BodyType<InventoryTransactionBody>;
+export type CreateInventoryTransactionMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Admin - create inventory transaction (add, sale, adjustment)
+ */
+export const useCreateInventoryTransaction = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createInventoryTransaction>>,
+    TError,
+    { data: BodyType<InventoryTransactionBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof createInventoryTransaction>>,
+  TError,
+  { data: BodyType<InventoryTransactionBody> },
+  TContext
+> => {
+  return useMutation(getCreateInventoryTransactionMutationOptions(options));
+};

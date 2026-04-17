@@ -1,6 +1,58 @@
 import bcrypt from "bcryptjs";
-import { db, pool, usersTable, categoriesTable, productsTable, deliveryAreasTable, settingsTable } from "@workspace/db";
+import { db, pool, usersTable, categoriesTable, productsTable, deliveryAreasTable, settingsTable, snackCategoriesTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
+
+/**
+ * Ensures snack store tables exist when `drizzle-kit push` was not run yet.
+ * Keeps column definitions aligned with lib/db/src/schema/snackCategories.ts and snacks.ts.
+ */
+async function ensureSnackStoreSchema() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS snack_categories (
+      id SERIAL PRIMARY KEY NOT NULL,
+      name VARCHAR(100) NOT NULL,
+      sort_order INTEGER NOT NULL DEFAULT 0,
+      status INTEGER NOT NULL DEFAULT 1,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    );
+  `);
+  await pool.query(`
+    ALTER TABLE snacks ADD COLUMN IF NOT EXISTS snack_category_id INTEGER;
+  `);
+  await pool.query(`
+    DO $$
+    BEGIN
+      IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint
+        WHERE conname = 'snacks_snack_category_id_snack_categories_id_fk'
+      ) THEN
+        ALTER TABLE snacks
+          ADD CONSTRAINT snacks_snack_category_id_snack_categories_id_fk
+          FOREIGN KEY (snack_category_id) REFERENCES snack_categories(id);
+      END IF;
+    EXCEPTION
+      WHEN duplicate_object THEN NULL;
+      WHEN undefined_table THEN NULL;
+    END $$;
+  `);
+}
+
+async function ensureGallerySchema() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS gallery_items (
+      id SERIAL PRIMARY KEY NOT NULL,
+      name VARCHAR(200) NOT NULL,
+      description TEXT,
+      image_url TEXT NOT NULL,
+      sort_order INTEGER NOT NULL DEFAULT 0,
+      status INTEGER NOT NULL DEFAULT 1,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    );
+  `);
+}
+
+await ensureSnackStoreSchema();
+await ensureGallerySchema();
 
 const adminPass = await bcrypt.hash("admin123", 10);
 const existing = await db.select().from(usersTable).limit(1);
@@ -15,9 +67,9 @@ if (existing.length === 0) {
 const existingCats = await db.select().from(categoriesTable).limit(1);
 if (existingCats.length === 0) {
   const cats = await db.insert(categoriesTable).values([
-    { name: "Dal & Sabzi", status: 1 },
-    { name: "Roti & Rice", status: 1 },
-    { name: "Farsan & Nasta", status: 1 },
+    { name: "Regular Thali", status: 1 },
+    { name: "Special Thali", status: 1 },
+    { name: "Evening Nasta", status: 1 },
     { name: "Sweets & Desserts", status: 1 },
     { name: "Beverages", status: 1 },
   ]).returning();
@@ -56,6 +108,19 @@ if (existingAreas.length === 0) {
   console.log("Delivery areas created");
 } else {
   console.log("Delivery areas already exist");
+}
+
+const existingSnackCats = await db.select().from(snackCategoriesTable).limit(1);
+if (existingSnackCats.length === 0) {
+  await db.insert(snackCategoriesTable).values([
+    { name: "Khakhra", sortOrder: 1, status: 1 },
+    { name: "Namkeen", sortOrder: 2, status: 1 },
+    { name: "Farsan", sortOrder: 3, status: 1 },
+    { name: "Sweets", sortOrder: 4, status: 1 },
+  ]);
+  console.log("Snack categories created");
+} else {
+  console.log("Snack categories already exist");
 }
 
 const existingSettings = await db.select().from(settingsTable).limit(1);

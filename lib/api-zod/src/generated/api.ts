@@ -271,7 +271,8 @@ export const GetCartResponse = zod.object({
     zod.object({
       id: zod.number(),
       cart_id: zod.number(),
-      product_id: zod.number(),
+      product_id: zod.number().optional(),
+      snack_id: zod.number().optional(),
       quantity: zod.number(),
       status: zod.number(),
       product: zod
@@ -289,6 +290,35 @@ export const GetCartResponse = zod.object({
           created_at: zod.coerce.date().optional(),
         })
         .optional(),
+      snack: zod
+        .object({
+          id: zod.number(),
+          name: zod.string(),
+          description: zod.string().optional(),
+          price: zod.string(),
+          imageUrl: zod.string().optional(),
+          snackCategoryId: zod.number().optional(),
+          weight: zod.string().optional(),
+          status: zod.number().optional(),
+          createdAt: zod.coerce.date().optional(),
+          SnackCategory: zod
+            .object({
+              id: zod.number(),
+              name: zod.string(),
+              sortOrder: zod.number(),
+              status: zod.number(),
+              createdAt: zod.coerce.date().optional(),
+            })
+            .optional(),
+          Inventory: zod
+            .object({
+              snackId: zod.number(),
+              quantity: zod.number(),
+              updatedAt: zod.coerce.date().optional(),
+            })
+            .optional(),
+        })
+        .optional(),
     }),
   ),
   subtotal: zod.string(),
@@ -298,7 +328,8 @@ export const GetCartResponse = zod.object({
  * @summary Add item to cart
  */
 export const AddToCartBody = zod.object({
-  product_id: zod.number(),
+  product_id: zod.number().optional(),
+  snack_id: zod.number().optional(),
   quantity: zod.number(),
 });
 
@@ -309,7 +340,8 @@ export const AddToCartResponse = zod.object({
     zod.object({
       id: zod.number(),
       cart_id: zod.number(),
-      product_id: zod.number(),
+      product_id: zod.number().optional(),
+      snack_id: zod.number().optional(),
       quantity: zod.number(),
       status: zod.number(),
       product: zod
@@ -325,6 +357,35 @@ export const AddToCartResponse = zod.object({
           stock: zod.number(),
           status: zod.number(),
           created_at: zod.coerce.date().optional(),
+        })
+        .optional(),
+      snack: zod
+        .object({
+          id: zod.number(),
+          name: zod.string(),
+          description: zod.string().optional(),
+          price: zod.string(),
+          imageUrl: zod.string().optional(),
+          snackCategoryId: zod.number().optional(),
+          weight: zod.string().optional(),
+          status: zod.number().optional(),
+          createdAt: zod.coerce.date().optional(),
+          SnackCategory: zod
+            .object({
+              id: zod.number(),
+              name: zod.string(),
+              sortOrder: zod.number(),
+              status: zod.number(),
+              createdAt: zod.coerce.date().optional(),
+            })
+            .optional(),
+          Inventory: zod
+            .object({
+              snackId: zod.number(),
+              quantity: zod.number(),
+              updatedAt: zod.coerce.date().optional(),
+            })
+            .optional(),
         })
         .optional(),
     }),
@@ -350,7 +411,8 @@ export const UpdateCartItemResponse = zod.object({
     zod.object({
       id: zod.number(),
       cart_id: zod.number(),
-      product_id: zod.number(),
+      product_id: zod.number().optional(),
+      snack_id: zod.number().optional(),
       quantity: zod.number(),
       status: zod.number(),
       product: zod
@@ -366,6 +428,35 @@ export const UpdateCartItemResponse = zod.object({
           stock: zod.number(),
           status: zod.number(),
           created_at: zod.coerce.date().optional(),
+        })
+        .optional(),
+      snack: zod
+        .object({
+          id: zod.number(),
+          name: zod.string(),
+          description: zod.string().optional(),
+          price: zod.string(),
+          imageUrl: zod.string().optional(),
+          snackCategoryId: zod.number().optional(),
+          weight: zod.string().optional(),
+          status: zod.number().optional(),
+          createdAt: zod.coerce.date().optional(),
+          SnackCategory: zod
+            .object({
+              id: zod.number(),
+              name: zod.string(),
+              sortOrder: zod.number(),
+              status: zod.number(),
+              createdAt: zod.coerce.date().optional(),
+            })
+            .optional(),
+          Inventory: zod
+            .object({
+              snackId: zod.number(),
+              quantity: zod.number(),
+              updatedAt: zod.coerce.date().optional(),
+            })
+            .optional(),
         })
         .optional(),
     }),
@@ -387,7 +478,8 @@ export const RemoveCartItemResponse = zod.object({
     zod.object({
       id: zod.number(),
       cart_id: zod.number(),
-      product_id: zod.number(),
+      product_id: zod.number().optional(),
+      snack_id: zod.number().optional(),
       quantity: zod.number(),
       status: zod.number(),
       product: zod
@@ -403,6 +495,35 @@ export const RemoveCartItemResponse = zod.object({
           stock: zod.number(),
           status: zod.number(),
           created_at: zod.coerce.date().optional(),
+        })
+        .optional(),
+      snack: zod
+        .object({
+          id: zod.number(),
+          name: zod.string(),
+          description: zod.string().optional(),
+          price: zod.string(),
+          imageUrl: zod.string().optional(),
+          snackCategoryId: zod.number().optional(),
+          weight: zod.string().optional(),
+          status: zod.number().optional(),
+          createdAt: zod.coerce.date().optional(),
+          SnackCategory: zod
+            .object({
+              id: zod.number(),
+              name: zod.string(),
+              sortOrder: zod.number(),
+              status: zod.number(),
+              createdAt: zod.coerce.date().optional(),
+            })
+            .optional(),
+          Inventory: zod
+            .object({
+              snackId: zod.number(),
+              quantity: zod.number(),
+              updatedAt: zod.coerce.date().optional(),
+            })
+            .optional(),
         })
         .optional(),
     }),
@@ -695,6 +816,84 @@ export const AdminListContactMessagesResponse = zod.array(
 );
 
 /**
+ * @summary List published gallery items
+ */
+export const ListGalleryItemsResponseItem = zod.object({
+  id: zod.number(),
+  name: zod.string(),
+  description: zod.string().nullish(),
+  imageUrl: zod.string(),
+  sortOrder: zod.number(),
+  status: zod.number(),
+  createdAt: zod.coerce.date().optional(),
+});
+export const ListGalleryItemsResponse = zod.array(ListGalleryItemsResponseItem);
+
+/**
+ * @summary Admin - list all gallery items
+ */
+export const AdminListGalleryItemsResponseItem = zod.object({
+  id: zod.number(),
+  name: zod.string(),
+  description: zod.string().nullish(),
+  imageUrl: zod.string(),
+  sortOrder: zod.number(),
+  status: zod.number(),
+  createdAt: zod.coerce.date().optional(),
+});
+export const AdminListGalleryItemsResponse = zod.array(
+  AdminListGalleryItemsResponseItem,
+);
+
+/**
+ * @summary Admin - create gallery item
+ */
+export const CreateGalleryItemBody = zod.object({
+  name: zod.string(),
+  description: zod.string().optional(),
+  imageUrl: zod.string(),
+  sortOrder: zod.number().optional(),
+  status: zod.number().optional(),
+});
+
+/**
+ * @summary Admin - update gallery item
+ */
+export const UpdateGalleryItemParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const UpdateGalleryItemBody = zod.object({
+  name: zod.string(),
+  description: zod.string().optional(),
+  imageUrl: zod.string(),
+  sortOrder: zod.number().optional(),
+  status: zod.number().optional(),
+});
+
+export const UpdateGalleryItemResponse = zod.object({
+  id: zod.number(),
+  name: zod.string(),
+  description: zod.string().nullish(),
+  imageUrl: zod.string(),
+  sortOrder: zod.number(),
+  status: zod.number(),
+  createdAt: zod.coerce.date().optional(),
+});
+
+/**
+ * @summary Admin - soft delete gallery item
+ */
+export const DeleteGalleryItemParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const DeleteGalleryItemResponse = zod.object({
+  success: zod.boolean(),
+  message: zod.string().optional(),
+});
+
+/**
  * @summary Admin - get dashboard statistics
  */
 export const GetDashboardStatsResponse = zod.object({
@@ -754,3 +953,352 @@ export const GetOrdersByCategoryResponseItem = zod.object({
 export const GetOrdersByCategoryResponse = zod.array(
   GetOrdersByCategoryResponseItem,
 );
+
+/**
+ * @summary List active snack categories (store filters)
+ */
+export const ListSnackCategoriesResponseItem = zod.object({
+  id: zod.number(),
+  name: zod.string(),
+  sortOrder: zod.number(),
+  status: zod.number(),
+  createdAt: zod.coerce.date().optional(),
+});
+export const ListSnackCategoriesResponse = zod.array(
+  ListSnackCategoriesResponseItem,
+);
+
+/**
+ * @summary Admin - list all snack categories
+ */
+export const AdminListSnackCategoriesResponseItem = zod.object({
+  id: zod.number(),
+  name: zod.string(),
+  sortOrder: zod.number(),
+  status: zod.number(),
+  createdAt: zod.coerce.date().optional(),
+});
+export const AdminListSnackCategoriesResponse = zod.array(
+  AdminListSnackCategoriesResponseItem,
+);
+
+/**
+ * @summary Admin - create snack category
+ */
+export const CreateSnackCategoryBody = zod.object({
+  name: zod.string(),
+  sortOrder: zod.number().optional(),
+  status: zod.number().optional(),
+});
+
+/**
+ * @summary Admin - update snack category
+ */
+export const UpdateSnackCategoryParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const UpdateSnackCategoryBody = zod.object({
+  name: zod.string(),
+  sortOrder: zod.number().optional(),
+  status: zod.number().optional(),
+});
+
+export const UpdateSnackCategoryResponse = zod.object({
+  id: zod.number(),
+  name: zod.string(),
+  sortOrder: zod.number(),
+  status: zod.number(),
+  createdAt: zod.coerce.date().optional(),
+});
+
+/**
+ * @summary Admin - soft delete snack category
+ */
+export const DeleteSnackCategoryParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const DeleteSnackCategoryResponse = zod.object({
+  success: zod.boolean(),
+  message: zod.string().optional(),
+});
+
+/**
+ * @summary List active snacks
+ */
+export const ListSnacksQueryParams = zod.object({
+  snack_category_id: zod.coerce.number().optional(),
+  search: zod.coerce.string().optional(),
+});
+
+export const ListSnacksResponseItem = zod.object({
+  id: zod.number(),
+  name: zod.string(),
+  description: zod.string().optional(),
+  price: zod.string(),
+  imageUrl: zod.string().optional(),
+  snackCategoryId: zod.number().optional(),
+  weight: zod.string().optional(),
+  status: zod.number().optional(),
+  createdAt: zod.coerce.date().optional(),
+  SnackCategory: zod
+    .object({
+      id: zod.number(),
+      name: zod.string(),
+      sortOrder: zod.number(),
+      status: zod.number(),
+      createdAt: zod.coerce.date().optional(),
+    })
+    .optional(),
+  Inventory: zod
+    .object({
+      snackId: zod.number(),
+      quantity: zod.number(),
+      updatedAt: zod.coerce.date().optional(),
+    })
+    .optional(),
+});
+export const ListSnacksResponse = zod.array(ListSnacksResponseItem);
+
+/**
+ * @summary Get a snack by ID
+ */
+export const GetSnackParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const GetSnackResponse = zod.object({
+  id: zod.number(),
+  name: zod.string(),
+  description: zod.string().optional(),
+  price: zod.string(),
+  imageUrl: zod.string().optional(),
+  snackCategoryId: zod.number().optional(),
+  weight: zod.string().optional(),
+  status: zod.number().optional(),
+  createdAt: zod.coerce.date().optional(),
+  SnackCategory: zod
+    .object({
+      id: zod.number(),
+      name: zod.string(),
+      sortOrder: zod.number(),
+      status: zod.number(),
+      createdAt: zod.coerce.date().optional(),
+    })
+    .optional(),
+  Inventory: zod
+    .object({
+      snackId: zod.number(),
+      quantity: zod.number(),
+      updatedAt: zod.coerce.date().optional(),
+    })
+    .optional(),
+});
+
+/**
+ * @summary Admin - list all snacks
+ */
+export const AdminListSnacksResponseItem = zod.object({
+  id: zod.number(),
+  name: zod.string(),
+  description: zod.string().optional(),
+  price: zod.string(),
+  imageUrl: zod.string().optional(),
+  snackCategoryId: zod.number().optional(),
+  weight: zod.string().optional(),
+  status: zod.number().optional(),
+  createdAt: zod.coerce.date().optional(),
+  SnackCategory: zod
+    .object({
+      id: zod.number(),
+      name: zod.string(),
+      sortOrder: zod.number(),
+      status: zod.number(),
+      createdAt: zod.coerce.date().optional(),
+    })
+    .optional(),
+  Inventory: zod
+    .object({
+      snackId: zod.number(),
+      quantity: zod.number(),
+      updatedAt: zod.coerce.date().optional(),
+    })
+    .optional(),
+});
+export const AdminListSnacksResponse = zod.array(AdminListSnacksResponseItem);
+
+/**
+ * @summary Admin - create snack
+ */
+export const CreateSnackBody = zod.object({
+  name: zod.string(),
+  description: zod.string().optional(),
+  price: zod.number(),
+  imageUrl: zod.string().optional(),
+  snackCategoryId: zod.number(),
+  weight: zod.string().optional(),
+  status: zod.number().optional(),
+});
+
+/**
+ * @summary Admin - update snack
+ */
+export const UpdateSnackParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const UpdateSnackBody = zod.object({
+  name: zod.string(),
+  description: zod.string().optional(),
+  price: zod.number(),
+  imageUrl: zod.string().optional(),
+  snackCategoryId: zod.number(),
+  weight: zod.string().optional(),
+  status: zod.number().optional(),
+});
+
+export const UpdateSnackResponse = zod.object({
+  id: zod.number(),
+  name: zod.string(),
+  description: zod.string().optional(),
+  price: zod.string(),
+  imageUrl: zod.string().optional(),
+  snackCategoryId: zod.number().optional(),
+  weight: zod.string().optional(),
+  status: zod.number().optional(),
+  createdAt: zod.coerce.date().optional(),
+  SnackCategory: zod
+    .object({
+      id: zod.number(),
+      name: zod.string(),
+      sortOrder: zod.number(),
+      status: zod.number(),
+      createdAt: zod.coerce.date().optional(),
+    })
+    .optional(),
+  Inventory: zod
+    .object({
+      snackId: zod.number(),
+      quantity: zod.number(),
+      updatedAt: zod.coerce.date().optional(),
+    })
+    .optional(),
+});
+
+/**
+ * @summary Admin - soft delete snack
+ */
+export const DeleteSnackParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const DeleteSnackResponse = zod.object({
+  success: zod.boolean(),
+  message: zod.string().optional(),
+});
+
+/**
+ * @summary Admin - toggle snack active/inactive
+ */
+export const ToggleSnackStatusParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const ToggleSnackStatusResponse = zod.object({
+  id: zod.number(),
+  name: zod.string(),
+  description: zod.string().optional(),
+  price: zod.string(),
+  imageUrl: zod.string().optional(),
+  snackCategoryId: zod.number().optional(),
+  weight: zod.string().optional(),
+  status: zod.number().optional(),
+  createdAt: zod.coerce.date().optional(),
+  SnackCategory: zod
+    .object({
+      id: zod.number(),
+      name: zod.string(),
+      sortOrder: zod.number(),
+      status: zod.number(),
+      createdAt: zod.coerce.date().optional(),
+    })
+    .optional(),
+  Inventory: zod
+    .object({
+      snackId: zod.number(),
+      quantity: zod.number(),
+      updatedAt: zod.coerce.date().optional(),
+    })
+    .optional(),
+});
+
+/**
+ * @summary Admin - list current inventory level of all snacks
+ */
+export const AdminListInventoryResponseItem = zod.object({
+  snackId: zod.number(),
+  quantity: zod.number(),
+  updatedAt: zod.coerce.date().optional(),
+});
+export const AdminListInventoryResponse = zod.array(
+  AdminListInventoryResponseItem,
+);
+
+/**
+ * @summary Admin - list inventory transactions
+ */
+export const AdminListInventoryTransactionsQueryParams = zod.object({
+  snack_id: zod.coerce.number().optional(),
+});
+
+export const AdminListInventoryTransactionsResponseItem = zod.object({
+  id: zod.number(),
+  snackId: zod.number(),
+  type: zod.string(),
+  quantity: zod.number(),
+  note: zod.string().optional(),
+  createdAt: zod.coerce.date().optional(),
+  Snack: zod
+    .object({
+      id: zod.number(),
+      name: zod.string(),
+      description: zod.string().optional(),
+      price: zod.string(),
+      imageUrl: zod.string().optional(),
+      snackCategoryId: zod.number().optional(),
+      weight: zod.string().optional(),
+      status: zod.number().optional(),
+      createdAt: zod.coerce.date().optional(),
+      SnackCategory: zod
+        .object({
+          id: zod.number(),
+          name: zod.string(),
+          sortOrder: zod.number(),
+          status: zod.number(),
+          createdAt: zod.coerce.date().optional(),
+        })
+        .optional(),
+      Inventory: zod
+        .object({
+          snackId: zod.number(),
+          quantity: zod.number(),
+          updatedAt: zod.coerce.date().optional(),
+        })
+        .optional(),
+    })
+    .optional(),
+});
+export const AdminListInventoryTransactionsResponse = zod.array(
+  AdminListInventoryTransactionsResponseItem,
+);
+
+/**
+ * @summary Admin - create inventory transaction (add, sale, adjustment)
+ */
+export const CreateInventoryTransactionBody = zod.object({
+  snackId: zod.number(),
+  type: zod.enum(["ADD", "SALE", "ADJUSTMENT"]),
+  quantity: zod.number(),
+  note: zod.string().optional(),
+});

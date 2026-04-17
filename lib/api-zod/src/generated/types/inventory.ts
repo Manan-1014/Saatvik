@@ -6,8 +6,8 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface AddToCartBody {
-  product_id?: number;
-  snack_id?: number;
+export interface Inventory {
+  snackId: number;
   quantity: number;
+  updatedAt?: Date;
 }

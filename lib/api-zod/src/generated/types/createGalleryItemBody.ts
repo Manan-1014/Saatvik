@@ -6,8 +6,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface AddToCartBody {
-  product_id?: number;
-  snack_id?: number;
-  quantity: number;
+export interface CreateGalleryItemBody {
+  name: string;
+  description?: string;
+  imageUrl: string;
+  sortOrder?: number;
+  status?: number;
 }

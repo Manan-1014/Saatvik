@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { eq, and, sql } from "drizzle-orm";
-import { db, ordersTable, orderItemsTable, cartTable, cartItemsTable, productsTable, deliveryAreasTable, usersTable, settingsTable } from "@workspace/db";
+import { db, ordersTable, orderItemsTable, cartTable, cartItemsTable, productsTable, deliveryAreasTable, usersTable, settingsTable, snacksTable } from "@workspace/db";
 import { CreateOrderBody, UpdateOrderStatusBody, AdminListOrdersQueryParams } from "@workspace/api-zod";
 import { authenticate, requireAdmin, type AuthRequest } from "../middlewares/auth";
 
@@ -12,12 +12,14 @@ async function buildOrderResponse(order: any) {
       id: orderItemsTable.id,
       order_id: orderItemsTable.orderId,
       product_id: orderItemsTable.productId,
+      snack_id: orderItemsTable.snackId,
       quantity: orderItemsTable.quantity,
       price: orderItemsTable.price,
-      product_name: productsTable.name,
+      product_name: sql<string>`COALESCE(${productsTable.name}, ${snacksTable.name})`.as("product_name"),
     })
     .from(orderItemsTable)
     .leftJoin(productsTable, eq(orderItemsTable.productId, productsTable.id))
+    .leftJoin(snacksTable, eq(orderItemsTable.snackId, snacksTable.id))
     .where(eq(orderItemsTable.orderId, order.id));
   return { ...order, items };
 }
@@ -51,13 +53,14 @@ router.post("/orders", authenticate, async (req: AuthRequest, res): Promise<void
   }
   const cartItems = await db.select().from(cartItemsTable)
     .leftJoin(productsTable, eq(cartItemsTable.productId, productsTable.id))
+    .leftJoin(snacksTable, eq(cartItemsTable.snackId, snacksTable.id))
     .where(and(eq(cartItemsTable.cartId, cart.id), eq(cartItemsTable.status, 1)));
   if (cartItems.length === 0) {
     res.status(400).json({ error: "Cart is empty" });
     return;
   }
 
-  const subtotal = cartItems.reduce((sum, row) => sum + (parseFloat(row.products?.price || "0") * row.cart_items.quantity), 0);
+  const subtotal = cartItems.reduce((sum, row) => sum + (parseFloat(row.products?.price || row.snacks?.price || "0") * row.cart_items.quantity), 0);
   const deliveryCharge = parseFloat(area.deliveryCharge.toString());
   const total = subtotal + deliveryCharge;
 
@@ -86,12 +89,13 @@ router.post("/orders", authenticate, async (req: AuthRequest, res): Promise<void
 
   // Create order items
   for (const row of cartItems) {
-    if (row.products) {
+    if (row.products || row.snacks) {
       await db.insert(orderItemsTable).values({
         orderId: order.id,
-        productId: row.cart_items.productId!,
+        productId: row.cart_items.productId || null,
+        snackId: row.cart_items.snackId || null,
         quantity: row.cart_items.quantity,
-        price: row.products.price,
+        price: row.products?.price || row.snacks?.price || "0",
       });
     }
   }

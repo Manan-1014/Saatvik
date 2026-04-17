@@ -1,9 +1,24 @@
 import { Link, useLocation } from "wouter";
-import { ShoppingCart, Menu, X, Leaf } from "lucide-react";
+import { ShoppingCart, Menu, X, ChevronDown, Images, UtensilsCrossed } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { getGetCartQueryKey, useGetCart } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
+import { BrandLogo } from "@/components/BrandLogo";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+const mainNav = [
+  { to: "/", label: "Home" },
+  { to: "/menu", label: "Menu" },
+  { to: "/snacks", label: "Snacks Store" },
+  { to: "/contact", label: "Contact" },
+  { to: "/track-order", label: "Track Order" },
+];
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
@@ -13,43 +28,67 @@ export function Navbar() {
 
   const cartCount = cart?.items?.reduce((s: number, i: any) => s + i.quantity, 0) ?? 0;
 
-  const links = [
-    { to: "/", label: "Home" },
-    { to: "/menu", label: "Menu" },
-    { to: "/contact", label: "Contact" },
-    { to: "/track-order", label: "Track Order" },
-  ];
-
   return (
     <nav className="bg-white border-b border-border sticky top-0 z-50 shadow-sm" data-testid="navbar">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-2" data-testid="nav-logo">
-            <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
-              <Leaf className="w-5 h-5 text-white" />
-            </div>
+          <Link to="/" className="flex items-center gap-2.5" data-testid="nav-logo">
+            <BrandLogo className="h-10 w-10 shadow-sm ring-2 ring-primary/15" />
             <div className="leading-tight">
               <div className="font-bold text-sm text-foreground">Saatvik Jain</div>
               <div className="text-xs text-muted-foreground">Aahar Gruh</div>
             </div>
           </Link>
 
-          {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-6">
-            {links.map(l => (
+          <div className="hidden md:flex items-center gap-1">
+            {mainNav.map((l) => (
               <Link
                 key={l.to}
                 to={l.to}
-                className={`text-sm font-medium transition-colors ${location === l.to ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}
-                data-testid={`nav-link-${l.label.toLowerCase().replace(" ", "-")}`}
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  location === l.to ? "text-primary bg-primary/5" : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
+                }`}
+                data-testid={`nav-link-${l.label.toLowerCase().replace(/\s+/g, "-")}`}
               >
                 {l.label}
               </Link>
             ))}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  className={`inline-flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium transition-colors outline-none ${
+                    location === "/gallery" ? "text-primary bg-primary/5" : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
+                  }`}
+                  data-testid="nav-more-trigger"
+                >
+                  More
+                  <ChevronDown className="w-4 h-4 opacity-70" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuItem asChild className="cursor-pointer">
+                  <Link to="/gallery" className="flex flex-col gap-0.5 py-2">
+                    <span className="flex items-center gap-2 font-medium">
+                      <Images className="w-4 h-4 text-primary" />
+                      Gallery
+                    </span>
+                    <span className="text-xs text-muted-foreground font-normal pl-6">Kitchen, food &amp; events photos</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild className="cursor-pointer">
+                  <Link to="/contact" className="flex flex-col gap-0.5 py-2">
+                    <span className="flex items-center gap-2 font-medium">
+                      <UtensilsCrossed className="w-4 h-4 text-primary" />
+                      Bulk orders &amp; catering
+                    </span>
+                    <span className="text-xs text-muted-foreground font-normal pl-6">Events, corporate, weddings</span>
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
-          {/* Right Actions */}
           <div className="flex items-center gap-3">
             <Link to="/cart" className="relative" data-testid="nav-cart">
               <Button variant="ghost" size="icon" className="relative">
@@ -78,19 +117,24 @@ export function Navbar() {
           </div>
         </div>
 
-        {/* Mobile Menu */}
         {open && (
-          <div className="md:hidden py-3 border-t border-border">
-            {links.map(l => (
+          <div className="md:hidden py-3 border-t border-border space-y-1">
+            {mainNav.map((l) => (
               <Link
                 key={l.to}
                 to={l.to}
-                className="block py-2 text-sm font-medium text-foreground hover:text-primary"
+                className="block py-2 px-2 text-sm font-medium text-foreground hover:text-primary rounded-md"
                 onClick={() => setOpen(false)}
               >
                 {l.label}
               </Link>
             ))}
+            <Link to="/gallery" className="block py-2 px-2 text-sm font-medium text-foreground hover:text-primary rounded-md" onClick={() => setOpen(false)}>
+              Gallery
+            </Link>
+            <Link to="/contact" className="block py-2 px-2 text-sm font-medium text-foreground hover:text-primary rounded-md" onClick={() => setOpen(false)}>
+              Bulk orders &amp; catering
+            </Link>
           </div>
         )}
       </div>

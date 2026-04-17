@@ -82,13 +82,43 @@ export interface ProductBody {
   status?: number;
 }
 
+export interface SnackCategory {
+  id: number;
+  name: string;
+  sortOrder: number;
+  status: number;
+  createdAt?: string;
+}
+
+export interface Inventory {
+  snackId: number;
+  quantity: number;
+  updatedAt?: string;
+}
+
+export interface Snack {
+  id: number;
+  name: string;
+  description?: string;
+  price: string;
+  imageUrl?: string;
+  snackCategoryId?: number;
+  weight?: string;
+  status?: number;
+  createdAt?: string;
+  SnackCategory?: SnackCategory;
+  Inventory?: Inventory;
+}
+
 export interface CartItem {
   id: number;
   cart_id: number;
-  product_id: number;
+  product_id?: number;
+  snack_id?: number;
   quantity: number;
   status: number;
   product?: ProductWithCategory;
+  snack?: Snack;
 }
 
 export interface CartWithItems {
@@ -99,7 +129,8 @@ export interface CartWithItems {
 }
 
 export interface AddToCartBody {
-  product_id: number;
+  product_id?: number;
+  snack_id?: number;
   quantity: number;
 }
 
@@ -200,6 +231,32 @@ export interface ContactMessage {
   created_at?: string;
 }
 
+export interface GalleryItem {
+  id: number;
+  name: string;
+  description?: string | null;
+  imageUrl: string;
+  sortOrder: number;
+  status: number;
+  createdAt?: string;
+}
+
+export interface CreateGalleryItemBody {
+  name: string;
+  description?: string;
+  imageUrl: string;
+  sortOrder?: number;
+  status?: number;
+}
+
+export interface UpdateGalleryItemBody {
+  name: string;
+  description?: string;
+  imageUrl: string;
+  sortOrder?: number;
+  status?: number;
+}
+
 export interface DashboardStats {
   today_orders: number;
   pending_orders: number;
@@ -222,6 +279,54 @@ export interface CategoryOrderCount {
   percentage: number;
 }
 
+export interface CreateSnackCategoryBody {
+  name: string;
+  sortOrder?: number;
+  status?: number;
+}
+
+export interface UpdateSnackCategoryBody {
+  name: string;
+  sortOrder?: number;
+  status?: number;
+}
+
+export interface SnackBody {
+  name: string;
+  description?: string;
+  price: number;
+  imageUrl?: string;
+  snackCategoryId: number;
+  weight?: string;
+  status?: number;
+}
+
+export interface InventoryTransaction {
+  id: number;
+  snackId: number;
+  type: string;
+  quantity: number;
+  note?: string;
+  createdAt?: string;
+  Snack?: Snack;
+}
+
+export type InventoryTransactionBodyType =
+  (typeof InventoryTransactionBodyType)[keyof typeof InventoryTransactionBodyType];
+
+export const InventoryTransactionBodyType = {
+  ADD: "ADD",
+  SALE: "SALE",
+  ADJUSTMENT: "ADJUSTMENT",
+} as const;
+
+export interface InventoryTransactionBody {
+  snackId: number;
+  type: InventoryTransactionBodyType;
+  quantity: number;
+  note?: string;
+}
+
 export type ListProductsParams = {
   category_id?: number;
   search?: string;
@@ -229,4 +334,13 @@ export type ListProductsParams = {
 
 export type AdminListOrdersParams = {
   status?: string;
+};
+
+export type ListSnacksParams = {
+  snack_category_id?: number;
+  search?: string;
+};
+
+export type AdminListInventoryTransactionsParams = {
+  snack_id?: number;
 };

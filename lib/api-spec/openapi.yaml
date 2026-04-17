@@ -25,6 +25,8 @@ tags:
     description: App settings
   - name: contact
     description: Contact messages
+  - name: gallery
+    description: Photo gallery (image URLs)
   - name: admin
     description: Admin operations
 
@@ -761,6 +763,104 @@ paths:
                 items:
                   $ref: "#/components/schemas/ContactMessage"
 
+  # GALLERY
+  /gallery:
+    get:
+      operationId: listGalleryItems
+      tags: [gallery]
+      summary: List published gallery items
+      responses:
+        "200":
+          description: Gallery items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GalleryItem"
+
+  /admin/gallery:
+    get:
+      operationId: adminListGalleryItems
+      tags: [admin]
+      summary: Admin - list all gallery items
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: All gallery items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GalleryItem"
+    post:
+      operationId: createGalleryItem
+      tags: [admin]
+      summary: Admin - create gallery item
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateGalleryItemBody"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GalleryItem"
+
+  /admin/gallery/{id}:
+    put:
+      operationId: updateGalleryItem
+      tags: [admin]
+      summary: Admin - update gallery item
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateGalleryItemBody"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GalleryItem"
+    delete:
+      operationId: deleteGalleryItem
+      tags: [admin]
+      summary: Admin - soft delete gallery item
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
   # ADMIN DASHBOARD
   /admin/dashboard:
     get:
@@ -810,6 +910,310 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/CategoryOrderCount"
+
+  # SNACK CATEGORIES (separate from menu categories)
+  /snack-categories:
+    get:
+      operationId: listSnackCategories
+      tags: [snacks]
+      summary: List active snack categories (store filters)
+      responses:
+        "200":
+          description: Snack categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SnackCategory"
+
+  /admin/snack-categories:
+    get:
+      operationId: adminListSnackCategories
+      tags: [admin]
+      summary: Admin - list all snack categories
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: All snack categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SnackCategory"
+    post:
+      operationId: createSnackCategory
+      tags: [admin]
+      summary: Admin - create snack category
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSnackCategoryBody"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SnackCategory"
+
+  /admin/snack-categories/{id}:
+    put:
+      operationId: updateSnackCategory
+      tags: [admin]
+      summary: Admin - update snack category
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSnackCategoryBody"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SnackCategory"
+    delete:
+      operationId: deleteSnackCategory
+      tags: [admin]
+      summary: Admin - soft delete snack category
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  # SNACKS
+  /snacks:
+    get:
+      operationId: listSnacks
+      tags: [snacks]
+      summary: List active snacks
+      parameters:
+        - name: snack_category_id
+          in: query
+          schema:
+            type: integer
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Snacks list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Snack"
+
+  /snacks/{id}:
+    get:
+      operationId: getSnack
+      tags: [snacks]
+      summary: Get a snack by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Snack detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Snack"
+
+  /admin/snacks:
+    get:
+      operationId: adminListSnacks
+      tags: [admin]
+      summary: Admin - list all snacks
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: All snacks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Snack"
+    post:
+      operationId: createSnack
+      tags: [admin]
+      summary: Admin - create snack
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SnackBody"
+      responses:
+        "201":
+          description: Snack created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Snack"
+
+  /admin/snacks/{id}:
+    put:
+      operationId: updateSnack
+      tags: [admin]
+      summary: Admin - update snack
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SnackBody"
+      responses:
+        "200":
+          description: Snack updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Snack"
+    delete:
+      operationId: deleteSnack
+      tags: [admin]
+      summary: Admin - soft delete snack
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /admin/snacks/{id}/toggle:
+    patch:
+      operationId: toggleSnackStatus
+      tags: [admin]
+      summary: Admin - toggle snack active/inactive
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Status toggled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Snack"
+
+  # INVENTORY
+  /admin/inventory:
+    get:
+      operationId: adminListInventory
+      tags: [admin]
+      summary: Admin - list current inventory level of all snacks
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: All inventory
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Inventory"
+
+  /admin/inventory/transactions:
+    get:
+      operationId: adminListInventoryTransactions
+      tags: [admin]
+      summary: Admin - list inventory transactions
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: snack_id
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: All inventory transactions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/InventoryTransaction"
+    post:
+      operationId: createInventoryTransaction
+      tags: [admin]
+      summary: Admin - create inventory transaction (add, sale, adjustment)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InventoryTransactionBody"
+      responses:
+        "201":
+          description: Transaction created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InventoryTransaction"
 
 components:
   securitySchemes:
@@ -1015,16 +1419,19 @@ components:
           type: integer
         product_id:
           type: integer
+        snack_id:
+          type: integer
         quantity:
           type: integer
         status:
           type: integer
         product:
           $ref: "#/components/schemas/ProductWithCategory"
+        snack:
+          $ref: "#/components/schemas/Snack"
       required:
         - id
         - cart_id
-        - product_id
         - quantity
         - status
 
@@ -1052,10 +1459,11 @@ components:
       properties:
         product_id:
           type: integer
+        snack_id:
+          type: integer
         quantity:
           type: integer
       required:
-        - product_id
         - quantity
 
     UpdateCartItemBody:
@@ -1307,6 +1715,66 @@ components:
         - message
         - status
 
+    GalleryItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        imageUrl:
+          type: string
+        sortOrder:
+          type: integer
+        status:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - imageUrl
+        - sortOrder
+        - status
+
+    CreateGalleryItemBody:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        imageUrl:
+          type: string
+        sortOrder:
+          type: integer
+        status:
+          type: integer
+      required:
+        - name
+        - imageUrl
+
+    UpdateGalleryItemBody:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        imageUrl:
+          type: string
+        sortOrder:
+          type: integer
+        status:
+          type: integer
+      required:
+        - name
+        - imageUrl
+
     # DASHBOARD
     DashboardStats:
       type: object
@@ -1363,3 +1831,155 @@ components:
         - category_name
         - count
         - percentage
+
+    SnackCategory:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        sortOrder:
+          type: integer
+        status:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - sortOrder
+        - status
+
+    CreateSnackCategoryBody:
+      type: object
+      properties:
+        name:
+          type: string
+        sortOrder:
+          type: integer
+        status:
+          type: integer
+      required:
+        - name
+
+    UpdateSnackCategoryBody:
+      type: object
+      properties:
+        name:
+          type: string
+        sortOrder:
+          type: integer
+        status:
+          type: integer
+      required:
+        - name
+
+    Snack:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: string
+        imageUrl:
+          type: string
+        snackCategoryId:
+          type: integer
+        weight:
+          type: string
+        status:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        SnackCategory:
+          $ref: '#/components/schemas/SnackCategory'
+        Inventory:
+          $ref: '#/components/schemas/Inventory'
+      required:
+        - id
+        - name
+        - price
+
+    SnackBody:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        imageUrl:
+          type: string
+        snackCategoryId:
+          type: integer
+        weight:
+          type: string
+        status:
+          type: integer
+      required:
+        - name
+        - price
+        - snackCategoryId
+
+    Inventory:
+      type: object
+      properties:
+        snackId:
+          type: integer
+        quantity:
+          type: integer
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - snackId
+        - quantity
+
+    InventoryTransaction:
+      type: object
+      properties:
+        id:
+          type: integer
+        snackId:
+          type: integer
+        type:
+          type: string
+        quantity:
+          type: integer
+        note:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        Snack:
+          $ref: '#/components/schemas/Snack'
+      required:
+        - id
+        - snackId
+        - type
+        - quantity
+
+    InventoryTransactionBody:
+      type: object
+      properties:
+        snackId:
+          type: integer
+        type:
+          type: string
+          enum: [ADD, SALE, ADJUSTMENT]
+        quantity:
+          type: integer
+        note:
+          type: string
+      required:
+        - snackId
+        - type
+        - quantity

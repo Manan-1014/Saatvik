@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { ArrowRight, ShieldCheck, Clock, Star, Leaf, ChefHat, Heart } from "lucide-react";
+import { ArrowRight, ShieldCheck, Clock, Star, Leaf, ChefHat, Heart, Images, Cookie, UtensilsCrossed } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/Navbar";
 import { useGetSettings } from "@workspace/api-client-react";
@@ -141,6 +141,38 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Quick links */}
+      <section className="py-12 bg-muted/30 border-y border-border">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-3 gap-4">
+            <Link
+              to="/contact"
+              className="rounded-2xl border-2 border-blue-200 bg-blue-50/80 p-6 hover:shadow-md transition-shadow text-left block"
+            >
+              <UtensilsCrossed className="w-8 h-8 text-blue-600 mb-3" />
+              <h3 className="font-semibold text-foreground mb-1">Bulk orders &amp; catering</h3>
+              <p className="text-sm text-muted-foreground">Events, weddings, corporate.</p>
+            </Link>
+            <Link
+              to="/snacks"
+              className="rounded-2xl border-2 border-orange-200 bg-orange-50/80 p-6 hover:shadow-md transition-shadow text-left block"
+            >
+              <Cookie className="w-8 h-8 text-orange-600 mb-3" />
+              <h3 className="font-semibold text-foreground mb-1">Snacks store</h3>
+              <p className="text-sm text-muted-foreground">Khakhra, Namkeen &amp; more.</p>
+            </Link>
+            <Link
+              to="/gallery"
+              className="rounded-2xl border-2 border-green-200 bg-green-50/80 p-6 hover:shadow-md transition-shadow text-left block"
+            >
+              <Images className="w-8 h-8 text-green-600 mb-3" />
+              <h3 className="font-semibold text-foreground mb-1">Gallery</h3>
+              <p className="text-sm text-muted-foreground">Kitchen &amp; food photos.</p>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="py-16 bg-primary text-white text-center">
         <div className="max-w-2xl mx-auto px-4">
@@ -153,13 +185,6 @@ export default function Home() {
           </Link>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-foreground text-white/60 py-8 text-center text-sm">
-        <div className="max-w-7xl mx-auto px-4">
-          <p>© 2026 Saatvik Jain Aahar Gruh. All rights reserved. | 12, Panchvati Society, Vastrapur, Ahmedabad - 380 015</p>
-        </div>
-      </footer>
     </div>
   );
 }

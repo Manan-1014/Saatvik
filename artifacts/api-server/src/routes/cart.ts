@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { eq, and } from "drizzle-orm";
-import { db, cartTable, cartItemsTable, productsTable, categoriesTable } from "@workspace/db";
+import { db, cartTable, cartItemsTable, productsTable, categoriesTable, snacksTable } from "@workspace/db";
 import { AddToCartBody, UpdateCartItemBody } from "@workspace/api-zod";
 import { authenticate, type AuthRequest } from "../middlewares/auth";
 
@@ -34,14 +34,29 @@ async function buildCartResponse(cartId: number, userId: number) {
         stock: productsTable.stock,
         status: productsTable.status,
         created_at: productsTable.createdAt,
+      },
+      snack: {
+        id: snacksTable.id,
+        name: snacksTable.name,
+        description: snacksTable.description,
+        price: snacksTable.price,
+        imageUrl: snacksTable.imageUrl,
+        snackCategoryId: snacksTable.snackCategoryId,
+        weight: snacksTable.weight,
+        status: snacksTable.status,
+        createdAt: snacksTable.createdAt,
       }
     })
     .from(cartItemsTable)
     .leftJoin(productsTable, eq(cartItemsTable.productId, productsTable.id))
     .leftJoin(categoriesTable, eq(productsTable.categoryId, categoriesTable.id))
+    .leftJoin(snacksTable, eq(cartItemsTable.snackId, snacksTable.id))
     .where(and(eq(cartItemsTable.cartId, cartId), eq(cartItemsTable.status, 1)));
 
-  const subtotal = items.reduce((sum, item) => sum + (parseFloat(item.product?.price || "0") * item.quantity), 0);
+  const subtotal = items.reduce((sum, item) => {
+    const p = parseFloat(item.product?.price || item.snack?.price || "0");
+    return sum + (p * item.quantity);
+  }, 0);
   return { id: cartId, user_id: userId, items, subtotal: subtotal.toFixed(2) };
 }
 
@@ -56,14 +71,30 @@ router.post("/cart/items", authenticate, async (req: AuthRequest, res): Promise<
     res.status(400).json({ error: parsed.error.message });
     return;
   }
+  if (!parsed.data.product_id && !parsed.data.snack_id) {
+    res.status(400).json({ error: "Must provide either product_id or snack_id" });
+    return;
+  }
   const cart = await getOrCreateCart(req.user!.id);
-  const existing = await db.select().from(cartItemsTable)
-    .where(and(eq(cartItemsTable.cartId, cart.id), eq(cartItemsTable.productId, parsed.data.product_id), eq(cartItemsTable.status, 1)))
-    .limit(1);
-  if (existing.length > 0) {
-    await db.update(cartItemsTable).set({ quantity: existing[0].quantity + parsed.data.quantity }).where(eq(cartItemsTable.id, existing[0].id));
-  } else {
-    await db.insert(cartItemsTable).values({ cartId: cart.id, productId: parsed.data.product_id, quantity: parsed.data.quantity, status: 1 });
+  
+  if (parsed.data.product_id) {
+    const existing = await db.select().from(cartItemsTable)
+      .where(and(eq(cartItemsTable.cartId, cart.id), eq(cartItemsTable.productId, parsed.data.product_id), eq(cartItemsTable.status, 1)))
+      .limit(1);
+    if (existing.length > 0) {
+      await db.update(cartItemsTable).set({ quantity: existing[0].quantity + parsed.data.quantity }).where(eq(cartItemsTable.id, existing[0].id));
+    } else {
+      await db.insert(cartItemsTable).values({ cartId: cart.id, productId: parsed.data.product_id, quantity: parsed.data.quantity, status: 1 });
+    }
+  } else if (parsed.data.snack_id) {
+    const existing = await db.select().from(cartItemsTable)
+      .where(and(eq(cartItemsTable.cartId, cart.id), eq(cartItemsTable.snackId, parsed.data.snack_id), eq(cartItemsTable.status, 1)))
+      .limit(1);
+    if (existing.length > 0) {
+      await db.update(cartItemsTable).set({ quantity: existing[0].quantity + parsed.data.quantity }).where(eq(cartItemsTable.id, existing[0].id));
+    } else {
+      await db.insert(cartItemsTable).values({ cartId: cart.id, snackId: parsed.data.snack_id, quantity: parsed.data.quantity, status: 1 });
+    }
   }
   res.json(await buildCartResponse(cart.id, req.user!.id));
 });

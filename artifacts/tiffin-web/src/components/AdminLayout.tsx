@@ -1,5 +1,6 @@
 import { Link, useLocation } from "wouter";
-import { LayoutDashboard, UtensilsCrossed, ClipboardList, MapPin, Settings, ArrowLeft, Leaf, Bell } from "lucide-react";
+import { LayoutDashboard, UtensilsCrossed, ClipboardList, MapPin, Settings, ArrowLeft, Bell, Cookie, Package, Tags, Images } from "lucide-react";
+import { BrandLogo } from "@/components/BrandLogo";
 import { ReactNode } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdminListOrders } from "@workspace/api-client-react";
@@ -17,9 +18,13 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const navItems = [
     { to: "/admin", icon: LayoutDashboard, label: "Dashboard" },
     { to: "/admin/menu", icon: UtensilsCrossed, label: "Menu Management" },
+    { to: "/admin/snacks", icon: Cookie, label: "Snacks" },
+    { to: "/admin/snack-categories", icon: Tags, label: "Snack categories" },
+    { to: "/admin/inventory", icon: Package, label: "Inventory" },
     { to: "/admin/orders", icon: ClipboardList, label: "Orders", badge: pendingCount },
     { to: "/admin/delivery-areas", icon: MapPin, label: "Delivery Areas" },
     { to: "/admin/settings", icon: Settings, label: "Settings" },
+    { to: "/admin/gallery", icon: Images, label: "Gallery" },
   ];
 
   return (
@@ -28,9 +33,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       <aside className="w-56 bg-sidebar text-sidebar-foreground flex flex-col">
         <div className="p-4 border-b border-sidebar-border">
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
-              <Leaf className="w-5 h-5 text-white" />
-            </div>
+            <BrandLogo className="h-10 w-10 ring-2 ring-sidebar-border" />
             <div>
               <div className="font-bold text-sm text-sidebar-foreground">Saatvik Jain</div>
               <div className="text-xs text-sidebar-foreground/60">Admin Panel</div>

@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Phone, MessageSquare, MapPin, Clock } from "lucide-react";
+import { Phone, MessageSquare, MapPin, Clock, Instagram, Facebook, Twitter, Mail, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -102,115 +102,144 @@ export default function Contact() {
           ))}
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8">
-          {/* Contact Form */}
-          <div className="bg-card border border-card-border rounded-2xl p-6">
-            <h2 className="text-xl font-semibold text-foreground mb-2">Send Us a Message</h2>
-            <p className="text-sm text-muted-foreground mb-6">For subscriptions, bulk orders, or any queries — fill the form below.</p>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(data => submitContact.mutate({ data: { ...data, email: data.email || undefined } }))} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Full Name *</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Your name" {...field} data-testid="input-contact-name" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="phone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Mobile Number *</FormLabel>
-                        <FormControl>
-                          <Input placeholder="+91 98765 43210" {...field} data-testid="input-contact-phone" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email Address (optional)</FormLabel>
-                      <FormControl>
-                        <Input type="email" placeholder="your@email.com" {...field} data-testid="input-contact-email" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="message"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Message *</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Tell us about your query — subscription plans, bulk orders, special requests..."
-                          className="h-32 resize-none"
-                          {...field}
-                          data-testid="input-contact-message"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button
-                  type="submit"
-                  className="w-full bg-primary hover:bg-primary/90 text-white"
-                  disabled={submitContact.isPending}
-                  data-testid="btn-submit-contact"
-                >
-                  {submitContact.isPending ? "Sending..." : "Send Message"}
-                </Button>
-              </form>
-            </Form>
-          </div>
-
-          {/* Map & Delivery Areas */}
-          <div className="space-y-6">
-            <div className="bg-card border border-card-border rounded-2xl overflow-hidden">
+        <div className="grid lg:grid-cols-5 gap-8 lg:gap-12 mt-16">
+          {/* Left: Map & Delivery Areas (3 columns width) */}
+          <div className="lg:col-span-3 space-y-6 flex flex-col">
+            <div className="bg-card border border-card-border rounded-3xl overflow-hidden shadow-sm flex-1 min-h-[400px]">
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3672.2!2d72.535!3d23.027!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjPCsDAxJzM3LjIiTiA3MsKwMzInMDYuMCJF!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
-                width="100%"
-                height="220"
+                className="w-full h-full min-h-[400px]"
                 style={{ border: 0 }}
                 allowFullScreen
                 loading="lazy"
                 title="Kitchen Location"
                 data-testid="map-kitchen"
               />
-              <div className="p-4">
-                <p className="font-medium text-foreground text-sm">12, Panchvati Society</p>
-                <p className="text-xs text-muted-foreground">Vastrapur, Ahmedabad - 380 015</p>
-                <a href="https://maps.google.com/?q=Vastrapur+Ahmedabad" target="_blank" rel="noopener noreferrer" className="text-xs text-primary font-medium mt-1 block hover:underline">
-                  Open in Google Maps →
-                </a>
-              </div>
             </div>
-
-            <div className="bg-card border border-card-border rounded-2xl p-5">
-              <h3 className="font-semibold text-foreground mb-3">Delivery Areas</h3>
+            
+            <div className="bg-card/50 border border-card-border rounded-3xl p-6 shadow-sm">
+              <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                 <MapPin className="w-5 h-5 text-primary" /> Delivery Areas
+              </h3>
               <div className="flex flex-wrap gap-2">
                 {areas?.map(area => (
-                  <span key={area.id} className="bg-secondary text-foreground text-xs px-3 py-1.5 rounded-full border border-border" data-testid={`delivery-area-${area.id}`}>
-                    {area.name} · &#x20B9;{area.delivery_charge}
+                  <span key={area.id} className="bg-white text-foreground text-xs px-4 py-2 rounded-full border border-border shadow-sm font-medium" data-testid={`delivery-area-${area.id}`}>
+                    {area.name} <span className="text-primary font-semibold ml-1">&#x20B9;{area.delivery_charge}</span>
                   </span>
                 ))}
               </div>
+            </div>
+          </div>
+
+          {/* Right: Contact Details and Form (2 columns width) */}
+          <div className="lg:col-span-2 space-y-8">
+             <div className="bg-card border border-card-border rounded-3xl p-8 shadow-sm">
+                <h2 className="text-2xl font-bold text-foreground mb-6" style={{ fontFamily: "Outfit, sans-serif" }}>Get in Touch</h2>
+                
+                <div className="space-y-6 mb-8">
+                   <div className="flex items-start gap-4">
+                      <div className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center shrink-0">
+                         <MapPin className="w-5 h-5 text-orange-600" />
+                      </div>
+                      <div>
+                         <p className="font-medium text-foreground">12, Panchvati Society</p>
+                         <p className="text-sm text-muted-foreground">Vastrapur, Ahmedabad - 380 015</p>
+                      </div>
+                   </div>
+                   <div className="flex items-start gap-4">
+                      <div className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center shrink-0">
+                         <Phone className="w-5 h-5 text-orange-600" />
+                      </div>
+                      <div>
+                         <p className="font-medium text-foreground">{settings?.contact_number || "+91 98765 43210"}</p>
+                         <p className="text-sm text-muted-foreground">Mon - Sun, 9 AM - 8 PM</p>
+                      </div>
+                   </div>
+                   <div className="flex items-start gap-4">
+                      <div className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center shrink-0">
+                         <Mail className="w-5 h-5 text-orange-600" />
+                      </div>
+                      <div>
+                         <p className="font-medium text-foreground">hello@saatvikaahargruh.com</p>
+                         <p className="text-sm text-muted-foreground">We reply within 24 hours</p>
+                      </div>
+                   </div>
+                </div>
+
+                <div className="pt-6 border-t border-border">
+                   <h3 className="font-medium text-foreground mb-4">Follow Us</h3>
+                   <div className="flex gap-3">
+                      <a href="#" className="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-colors duration-300">
+                         <Facebook className="w-5 h-5" />
+                      </a>
+                      <a href="#" className="w-10 h-10 rounded-full bg-pink-50 text-pink-600 flex items-center justify-center hover:bg-pink-600 hover:text-white transition-colors duration-300">
+                         <Instagram className="w-5 h-5" />
+                      </a>
+                      <a href="#" className="w-10 h-10 rounded-full bg-sky-50 text-sky-600 flex items-center justify-center hover:bg-sky-500 hover:text-white transition-colors duration-300">
+                         <Twitter className="w-5 h-5" />
+                      </a>
+                      <a href="#" className="w-10 h-10 rounded-full bg-green-50 text-green-600 flex items-center justify-center hover:bg-green-600 hover:text-white transition-colors duration-300">
+                         <MessageSquare className="w-5 h-5" />
+                      </a>
+                   </div>
+                </div>
+             </div>
+
+            {/* Contact Form */}
+            <div className="bg-card border border-card-border rounded-3xl p-8 shadow-sm">
+              <h3 className="text-xl font-semibold text-foreground mb-1">Send a Message</h3>
+              <p className="text-sm text-muted-foreground mb-6">Bulk orders, queries, or subscriptions.</p>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(data => submitContact.mutate({ data: { ...data, email: data.email || undefined } }))} className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input className="bg-white border-card-border" placeholder="Full Name" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="phone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input className="bg-white border-card-border" placeholder="Mobile Number" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  <FormField
+                    control={form.control}
+                    name="message"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Textarea
+                            placeholder="How can we help you?"
+                            className="h-28 resize-none bg-white border-card-border"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button
+                    type="submit"
+                    className="w-full bg-primary hover:bg-primary/90 text-white rounded-xl py-6"
+                    disabled={submitContact.isPending}
+                  >
+                    {submitContact.isPending ? "Sending..." : "Send Message"} <Send className="w-4 h-4 ml-2" />
+                  </Button>
+                </form>
+              </Form>
             </div>
           </div>
         </div>

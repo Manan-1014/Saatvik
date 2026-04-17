@@ -5,16 +5,14 @@
  * Saatvik Jain Aahar Gruh - Tiffin Service API
  * OpenAPI spec version: 0.1.0
  */
-import type { ProductWithCategory } from "./productWithCategory";
 import type { Snack } from "./snack";
 
-export interface CartItem {
+export interface InventoryTransaction {
   id: number;
-  cart_id: number;
-  product_id?: number;
-  snack_id?: number;
+  snackId: number;
+  type: string;
   quantity: number;
-  status: number;
-  product?: ProductWithCategory;
-  snack?: Snack;
+  note?: string;
+  createdAt?: Date;
+  Snack?: Snack;
 }

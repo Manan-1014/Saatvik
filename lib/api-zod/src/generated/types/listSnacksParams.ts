@@ -6,8 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface AddToCartBody {
-  product_id?: number;
-  snack_id?: number;
-  quantity: number;
-}
+export type ListSnacksParams = {
+  snack_category_id?: number;
+  search?: string;
+};

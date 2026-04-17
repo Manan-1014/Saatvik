@@ -4,6 +4,7 @@ import { z } from "zod/v4";
 import { usersTable } from "./users";
 import { deliveryAreasTable } from "./deliveryAreas";
 import { productsTable } from "./products";
+import { snacksTable } from "./snacks";
 
 export const ordersTable = pgTable("orders", {
   id: serial("id").primaryKey(),
@@ -14,6 +15,12 @@ export const ordersTable = pgTable("orders", {
   total: decimal("total", { precision: 10, scale: 2 }).notNull().default("0"),
   status: varchar("status", { length: 50 }).default("pending"),
   paymentMethod: varchar("payment_method", { length: 20 }),
+  /**
+   * payment_status tracks the online-payment lifecycle independently of order fulfilment status.
+   * Values: pending | paid | failed | refunded
+   * COD orders stay "pending" (no online payment required).
+   */
+  paymentStatus: varchar("payment_status", { length: 20 }).notNull().default("pending"),
   orderTime: timestamp("order_time", { withTimezone: true }).defaultNow(),
   deliveryDate: date("delivery_date"),
 });
@@ -22,6 +29,7 @@ export const orderItemsTable = pgTable("order_items", {
   id: serial("id").primaryKey(),
   orderId: integer("order_id").references(() => ordersTable.id),
   productId: integer("product_id").references(() => productsTable.id),
+  snackId: integer("snack_id").references(() => snacksTable.id),
   quantity: integer("quantity").notNull(),
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),
 });

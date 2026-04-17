@@ -2,8 +2,8 @@ import { Link, useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Leaf } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { BrandLogo } from "@/components/BrandLogo";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useLogin } from "@workspace/api-client-react";
@@ -47,8 +47,8 @@ export default function Login() {
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="w-14 h-14 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <Leaf className="w-7 h-7 text-white" />
+          <div className="mx-auto mb-4 flex justify-center">
+            <BrandLogo className="h-16 w-16 shadow-md ring-2 ring-primary/20" />
           </div>
           <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "Poppins, sans-serif" }}>Welcome back</h1>
           <p className="text-muted-foreground text-sm mt-1">Sign in to order your favourite Jain meals</p>
