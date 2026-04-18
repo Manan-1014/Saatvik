@@ -25,6 +25,9 @@ pnpm-debug.log*
 coverage/
 .nyc_output/
 
+# ─── Turborepo ───────────────────────────────────────────────────────────────
+.turbo/
+
 # ─── Vite / esbuild cache ────────────────────────────────────────────────────
 .vite/
 .cache/

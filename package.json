@@ -1,27 +1,38 @@
 {
   "name": "workspace",
   "version": "0.0.0",
+  "private": true,
   "license": "MIT",
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
   "scripts": {
-    "preinstall": "sh -c 'rm -f package-lock.json yarn.lock; case \"$npm_config_user_agent\" in pnpm/*) ;; *) echo \"Use pnpm instead\" >&2; exit 1 ;; esac'",
-    "predev": "node -e \"const fs=require('fs');if(!fs.existsSync('.env')){console.error('\\nERROR: .env not found.\\nRun: cp .env.example .env and fill in your values.\\n');process.exit(1)}\"",
-    "dev": "pnpm install && pnpm run dev:db && pnpm run dev:seed && pnpm run dev:serve",
+    "preinstall": "node scripts/check-package-manager.js",
+    "dev": "dotenv -e .env -- turbo dev --filter=@workspace/api-server --filter=@workspace/tiffin-web",
+    "dev:api": "dotenv -e .env -- sh -c 'PORT=$API_PORT pnpm --filter @workspace/api-server dev'",
+    "dev:web": "dotenv -e .env -- sh -c 'PORT=$WEB_PORT API_SERVER_URL=${API_SERVER_URL:-http://localhost:$API_PORT} pnpm --filter @workspace/tiffin-web dev'",
+    "setup": "pnpm install && pnpm run db:push && pnpm run db:seed",
+    "setup:fresh": "pnpm run clean && pnpm run setup",
     "db:push": "dotenv -e .env -- pnpm --filter @workspace/db push",
     "db:push-force": "dotenv -e .env -- pnpm --filter @workspace/db push-force",
-    "dev:db": "pnpm run db:push",
-    "dev:seed": "dotenv -e .env -- pnpm --filter @workspace/scripts exec tsx ../artifacts/api-server/seed.mjs",
-    "dev:serve": "dotenv -e .env -- concurrently --kill-others -n \"api,web\" -c \"cyan,magenta\" \"pnpm run dev:api\" \"pnpm run dev:web\"",
-    "dev:api": "dotenv -e .env -- sh -c 'PORT=$API_PORT pnpm --filter @workspace/api-server dev'",
-    "dev:web": "dotenv -e .env -- sh -c 'PORT=$WEB_PORT API_SERVER_URL=http://localhost:$API_PORT pnpm --filter @workspace/tiffin-web dev'",
+    "db:seed": "dotenv -e .env -- pnpm --filter @workspace/scripts exec tsx ../artifacts/api-server/seed.mjs",
+    "db:studio": "dotenv -e .env -- pnpm --filter @workspace/db studio",
     "build": "pnpm run typecheck && pnpm -r --if-present run build",
+    "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck",
     "typecheck:libs": "tsc --build",
-    "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck"
+    "lint": "pnpm -r --if-present run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\" --ignore-path .gitignore",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,json,md}\" --ignore-path .gitignore",
+    "test": "pnpm -r --if-present run test",
+    "test:ci": "pnpm -r --if-present run test:ci",
+    "clean": "pnpm -r --if-present run clean && rm -rf node_modules .turbo"
   },
-  "private": true,
   "devDependencies": {
-    "concurrently": "^9.2.1",
     "dotenv-cli": "^11.0.0",
     "prettier": "^3.8.1",
+    "turbo": "^2.9.6",
     "typescript": "~5.9.2"
   }
 }
