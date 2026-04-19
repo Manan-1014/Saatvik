@@ -16,11 +16,14 @@ export const ordersTable = pgTable("orders", {
   status: varchar("status", { length: 50 }).default("pending"),
   paymentMethod: varchar("payment_method", { length: 20 }),
   /**
-   * payment_status tracks the online-payment lifecycle independently of order fulfilment status.
-   * Values: pending | paid | failed | refunded
-   * COD orders stay "pending" (no online payment required).
+   * Online / recorded payment state (independent of fulfilment `status`).
+   * PENDING — not yet paid or awaiting Razorpay; SUCCESS — paid or COD confirmed; FAILED — Razorpay failed or signature invalid.
    */
-  paymentStatus: varchar("payment_status", { length: 20 }).notNull().default("pending"),
+  paymentStatus: varchar("payment_status", { length: 20 }).notNull().default("PENDING"),
+  /** Razorpay payment_id after successful verification (API field name: paymentId). */
+  razorpayPaymentId: varchar("razorpay_payment_id", { length: 100 }),
+  /** Razorpay order_id used for checkout (API field name: orderId from provider). */
+  razorpayOrderId: varchar("razorpay_order_id", { length: 100 }),
   orderTime: timestamp("order_time", { withTimezone: true }).defaultNow(),
   deliveryDate: date("delivery_date"),
 });

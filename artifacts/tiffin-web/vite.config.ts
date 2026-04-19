@@ -9,6 +9,11 @@ const port = Number(process.env.PORT ?? "3000");
 const basePath = process.env.BASE_PATH ?? "/";
 const apiServerUrl = process.env.API_SERVER_URL;
 
+if (apiServerUrl) {
+  // eslint-disable-next-line no-console -- dev-only wiring hint for /api 502 debugging
+  console.info(`[vite] API proxy: /api -> ${apiServerUrl}`);
+}
+
 export default defineConfig({
   base: basePath,
   plugins: [
@@ -37,6 +42,12 @@ export default defineConfig({
             "/api": {
               target: apiServerUrl,
               changeOrigin: true,
+              configure(proxy) {
+                proxy.on("error", (err: NodeJS.ErrnoException) => {
+                  // eslint-disable-next-line no-console -- surfaces ECONNREFUSED when API is down / wrong port
+                  console.error(`[vite proxy] /api -> ${apiServerUrl} failed:`, err.code ?? err.message);
+                });
+              },
             },
           },
         }

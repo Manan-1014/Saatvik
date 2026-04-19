@@ -2,6 +2,8 @@ import { pgTable, serial, integer, varchar, timestamp, text } from "drizzle-orm/
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 import { ordersTable } from "./orders";
+import { usersTable } from "./users";
+import { deliveryAreasTable } from "./deliveryAreas";
 
 /**
  * Tracks every Razorpay payment attempt linked to an app order.
@@ -14,7 +16,13 @@ import { ordersTable } from "./orders";
  */
 export const paymentsTable = pgTable("payments", {
   id: serial("id").primaryKey(),
-  orderId: integer("order_id").notNull().references(() => ordersTable.id),
+  /** Set after payment succeeds and an app order row is created; null while checkout is in progress */
+  orderId: integer("order_id").references(() => ordersTable.id),
+  /** Owner of the checkout — required when orderId is null */
+  userId: integer("user_id").references(() => usersTable.id),
+  deliveryAreaId: integer("delivery_area_id").references(() => deliveryAreasTable.id),
+  /** JSON: cart lines + totals at create-order time (server-built) for post-payment order creation */
+  checkoutSnapshot: text("checkout_snapshot"),
 
   // IDs from Razorpay
   razorpayOrderId: varchar("razorpay_order_id", { length: 100 }).notNull(),

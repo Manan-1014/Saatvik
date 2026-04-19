@@ -31,6 +31,14 @@ router.post("/orders", authenticate, async (req: AuthRequest, res): Promise<void
     return;
   }
 
+  if (parsed.data.payment_method === "razorpay") {
+    res.status(400).json({
+      error:
+        "Razorpay checkout must use POST /api/payment/create-order first; the app order is created only after payment succeeds.",
+    });
+    return;
+  }
+
   // Check maintenance mode & cutoff
   const [settings] = await db.select().from(settingsTable).where(eq(settingsTable.status, 1)).limit(1);
   if (settings?.maintenanceMode) {
@@ -84,6 +92,7 @@ router.post("/orders", authenticate, async (req: AuthRequest, res): Promise<void
     total: total.toFixed(2),
     status: "pending",
     paymentMethod: parsed.data.payment_method,
+    paymentStatus: "SUCCESS",
     deliveryDate: deliveryDate.toISOString().split("T")[0],
   }).returning();
 
@@ -121,6 +130,9 @@ async function getOrderWithMeta(orderId: number) {
       total: ordersTable.total,
       status: ordersTable.status,
       payment_method: ordersTable.paymentMethod,
+      payment_status: ordersTable.paymentStatus,
+      razorpay_payment_id: ordersTable.razorpayPaymentId,
+      razorpay_order_id: ordersTable.razorpayOrderId,
       order_time: ordersTable.orderTime,
       delivery_date: ordersTable.deliveryDate,
     })
@@ -146,6 +158,9 @@ router.get("/orders/my", authenticate, async (req: AuthRequest, res): Promise<vo
       total: ordersTable.total,
       status: ordersTable.status,
       payment_method: ordersTable.paymentMethod,
+      payment_status: ordersTable.paymentStatus,
+      razorpay_payment_id: ordersTable.razorpayPaymentId,
+      razorpay_order_id: ordersTable.razorpayOrderId,
       order_time: ordersTable.orderTime,
       delivery_date: ordersTable.deliveryDate,
     })
@@ -191,6 +206,9 @@ router.get("/admin/orders", authenticate, requireAdmin, async (req, res): Promis
       total: ordersTable.total,
       status: ordersTable.status,
       payment_method: ordersTable.paymentMethod,
+      payment_status: ordersTable.paymentStatus,
+      razorpay_payment_id: ordersTable.razorpayPaymentId,
+      razorpay_order_id: ordersTable.razorpayOrderId,
       order_time: ordersTable.orderTime,
       delivery_date: ordersTable.deliveryDate,
     })

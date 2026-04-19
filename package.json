@@ -9,7 +9,6 @@
     "pnpm": ">=9.0.0"
   },
   "scripts": {
-    "preinstall": "node scripts/check-package-manager.js",
     "dev": "dotenv -e .env -- turbo dev --filter=@workspace/api-server --filter=@workspace/tiffin-web",
     "dev:api": "dotenv -e .env -- sh -c 'PORT=$API_PORT pnpm --filter @workspace/api-server dev'",
     "dev:web": "dotenv -e .env -- sh -c 'PORT=$WEB_PORT API_SERVER_URL=${API_SERVER_URL:-http://localhost:$API_PORT} pnpm --filter @workspace/tiffin-web dev'",

@@ -11,7 +11,7 @@ import settingsRouter from "./settings";
 import contactRouter from "./contact";
 import galleryRouter from "./gallery";
 import dashboardRouter from "./dashboard";
-import paymentsRouter from "./payments";
+import paymentRouter from "./payment";
 import snacksRouter from "./snacks";
 import inventoryRouter from "./inventory";
 
@@ -31,6 +31,6 @@ router.use(settingsRouter);
 router.use(contactRouter);
 router.use(galleryRouter);
 router.use(dashboardRouter);
-router.use(paymentsRouter);
+router.use(paymentRouter);
 
 export default router;
