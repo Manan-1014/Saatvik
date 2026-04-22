@@ -12,6 +12,7 @@ export interface ProductBody {
   price: string;
   image_url?: string | null;
   category_id?: number | null;
+  menu_date: Date;
   is_special?: boolean;
   stock: number;
   status?: number;

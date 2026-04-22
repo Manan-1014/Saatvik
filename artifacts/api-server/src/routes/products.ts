@@ -1,10 +1,25 @@
 import { Router, type IRouter } from "express";
 import { eq, and, ilike, sql } from "drizzle-orm";
 import { db, productsTable, categoriesTable } from "@workspace/db";
-import { ListProductsQueryParams, CreateProductBody, UpdateProductBody } from "@workspace/api-zod";
+import { CreateProductBody, UpdateProductBody } from "@workspace/api-zod";
 import { authenticate, requireAdmin, type AuthRequest } from "../middlewares/auth";
 
 const router: IRouter = Router();
+
+function todayIsoDate(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function normalizeMenuDate(raw?: string): string {
+  if (!raw) return todayIsoDate();
+  // Keep accepted format strict to avoid timezone surprises.
+  const ok = /^\d{4}-\d{2}-\d{2}$/.test(raw);
+  return ok ? raw : todayIsoDate();
+}
+
+function toIsoDateOnly(value: Date): string {
+  return value.toISOString().slice(0, 10);
+}
 
 const withCategory = async (where: any) => {
   return db
@@ -15,6 +30,7 @@ const withCategory = async (where: any) => {
       price: productsTable.price,
       image_url: productsTable.imageUrl,
       category_id: productsTable.categoryId,
+      menu_date: productsTable.menuDate,
       category_name: categoriesTable.name,
       is_special: productsTable.isSpecial,
       stock: productsTable.stock,
@@ -27,13 +43,18 @@ const withCategory = async (where: any) => {
 };
 
 router.get("/products", async (req, res): Promise<void> => {
-  const q = ListProductsQueryParams.safeParse(req.query);
   const conditions: any[] = [eq(productsTable.status, 1)];
-  if (q.success && q.data.category_id) {
-    conditions.push(eq(productsTable.categoryId, q.data.category_id));
+  const rawCategoryId = Array.isArray(req.query.category_id) ? req.query.category_id[0] : req.query.category_id;
+  const rawSearch = Array.isArray(req.query.search) ? req.query.search[0] : req.query.search;
+  const rawMenuDate = Array.isArray(req.query.menu_date) ? req.query.menu_date[0] : req.query.menu_date;
+  const menuDate = normalizeMenuDate(typeof rawMenuDate === "string" ? rawMenuDate : undefined);
+  conditions.push(eq(productsTable.menuDate, menuDate));
+  const categoryId = rawCategoryId ? parseInt(String(rawCategoryId), 10) : NaN;
+  if (!Number.isNaN(categoryId)) {
+    conditions.push(eq(productsTable.categoryId, categoryId));
   }
-  if (q.success && q.data.search) {
-    conditions.push(ilike(productsTable.name, `%${q.data.search}%`));
+  if (typeof rawSearch === "string" && rawSearch.trim().length > 0) {
+    conditions.push(ilike(productsTable.name, `%${rawSearch.trim()}%`));
   }
   const products = await withCategory(and(...conditions));
   res.json(products);
@@ -47,8 +68,10 @@ router.get("/products/:id", async (req, res): Promise<void> => {
   res.json(product);
 });
 
-router.get("/admin/products", authenticate, requireAdmin, async (_req, res): Promise<void> => {
-  const products = await withCategory(undefined);
+router.get("/admin/products", authenticate, requireAdmin, async (req, res): Promise<void> => {
+  const rawMenuDate = Array.isArray(req.query.menu_date) ? req.query.menu_date[0] : req.query.menu_date;
+  const menuDate = normalizeMenuDate(typeof rawMenuDate === "string" ? rawMenuDate : undefined);
+  const products = await withCategory(eq(productsTable.menuDate, menuDate));
   res.json(products);
 });
 
@@ -64,6 +87,7 @@ router.post("/admin/products", authenticate, requireAdmin, async (req: AuthReque
     price: parsed.data.price,
     imageUrl: parsed.data.image_url,
     categoryId: parsed.data.category_id,
+    menuDate: toIsoDateOnly(parsed.data.menu_date),
     isSpecial: parsed.data.is_special ?? false,
     stock: parsed.data.stock ?? 0,
     status: parsed.data.status ?? 1,
@@ -86,6 +110,7 @@ router.put("/admin/products/:id", authenticate, requireAdmin, async (req: AuthRe
     price: parsed.data.price,
     imageUrl: parsed.data.image_url,
     categoryId: parsed.data.category_id,
+    menuDate: toIsoDateOnly(parsed.data.menu_date),
     isSpecial: parsed.data.is_special ?? false,
     stock: parsed.data.stock ?? 0,
     status: parsed.data.status ?? 1,

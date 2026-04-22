@@ -123,6 +123,10 @@ export const DeleteCategoryResponse = zod.object({
  */
 export const ListProductsQueryParams = zod.object({
   category_id: zod.coerce.number().optional(),
+  menu_date: zod
+    .date()
+    .optional()
+    .describe("Menu day in YYYY-MM-DD (defaults to today)"),
   search: zod.coerce.string().optional(),
 });
 
@@ -133,6 +137,7 @@ export const ListProductsResponseItem = zod.object({
   price: zod.string(),
   image_url: zod.string().nullish(),
   category_id: zod.number().nullish(),
+  menu_date: zod.coerce.date(),
   category_name: zod.string().nullish(),
   is_special: zod.boolean(),
   stock: zod.number(),
@@ -155,6 +160,7 @@ export const GetProductResponse = zod.object({
   price: zod.string(),
   image_url: zod.string().nullish(),
   category_id: zod.number().nullish(),
+  menu_date: zod.coerce.date(),
   category_name: zod.string().nullish(),
   is_special: zod.boolean(),
   stock: zod.number(),
@@ -165,6 +171,15 @@ export const GetProductResponse = zod.object({
 /**
  * @summary Admin - list all products
  */
+export const AdminListProductsQueryParams = zod.object({
+  menu_date: zod
+    .date()
+    .optional()
+    .describe(
+      "Filter admin list by menu day in YYYY-MM-DD (defaults to today)",
+    ),
+});
+
 export const AdminListProductsResponseItem = zod.object({
   id: zod.number(),
   name: zod.string(),
@@ -172,6 +187,7 @@ export const AdminListProductsResponseItem = zod.object({
   price: zod.string(),
   image_url: zod.string().nullish(),
   category_id: zod.number().nullish(),
+  menu_date: zod.coerce.date(),
   category_name: zod.string().nullish(),
   is_special: zod.boolean(),
   stock: zod.number(),
@@ -191,6 +207,7 @@ export const CreateProductBody = zod.object({
   price: zod.string(),
   image_url: zod.string().nullish(),
   category_id: zod.number().nullish(),
+  menu_date: zod.coerce.date(),
   is_special: zod.boolean().optional(),
   stock: zod.number(),
   status: zod.number().optional(),
@@ -209,6 +226,7 @@ export const UpdateProductBody = zod.object({
   price: zod.string(),
   image_url: zod.string().nullish(),
   category_id: zod.number().nullish(),
+  menu_date: zod.coerce.date(),
   is_special: zod.boolean().optional(),
   stock: zod.number(),
   status: zod.number().optional(),
@@ -221,6 +239,7 @@ export const UpdateProductResponse = zod.object({
   price: zod.string(),
   image_url: zod.string().nullish(),
   category_id: zod.number().nullish(),
+  menu_date: zod.coerce.date(),
   category_name: zod.string().nullish(),
   is_special: zod.boolean(),
   stock: zod.number(),
@@ -254,6 +273,7 @@ export const ToggleProductStatusResponse = zod.object({
   price: zod.string(),
   image_url: zod.string().nullish(),
   category_id: zod.number().nullish(),
+  menu_date: zod.coerce.date(),
   category_name: zod.string().nullish(),
   is_special: zod.boolean(),
   stock: zod.number(),
@@ -283,6 +303,7 @@ export const GetCartResponse = zod.object({
           price: zod.string(),
           image_url: zod.string().nullish(),
           category_id: zod.number().nullish(),
+          menu_date: zod.coerce.date(),
           category_name: zod.string().nullish(),
           is_special: zod.boolean(),
           stock: zod.number(),
@@ -352,6 +373,7 @@ export const AddToCartResponse = zod.object({
           price: zod.string(),
           image_url: zod.string().nullish(),
           category_id: zod.number().nullish(),
+          menu_date: zod.coerce.date(),
           category_name: zod.string().nullish(),
           is_special: zod.boolean(),
           stock: zod.number(),
@@ -423,6 +445,7 @@ export const UpdateCartItemResponse = zod.object({
           price: zod.string(),
           image_url: zod.string().nullish(),
           category_id: zod.number().nullish(),
+          menu_date: zod.coerce.date(),
           category_name: zod.string().nullish(),
           is_special: zod.boolean(),
           stock: zod.number(),
@@ -490,6 +513,7 @@ export const RemoveCartItemResponse = zod.object({
           price: zod.string(),
           image_url: zod.string().nullish(),
           category_id: zod.number().nullish(),
+          menu_date: zod.coerce.date(),
           category_name: zod.string().nullish(),
           is_special: zod.boolean(),
           stock: zod.number(),

@@ -15,12 +15,22 @@ import { z } from "zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 
+function todayIsoDate() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function formatMenuDateLabel(value: string) {
+  const d = new Date(`${value}T00:00:00`);
+  return d.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short", year: "numeric" });
+}
+
 const productSchema = z.object({
   name: z.string().min(1, "Name required"),
   description: z.string().optional(),
   price: z.string().min(1, "Price required"),
   image_url: z.string().optional(),
   category_id: z.string().optional(),
+  menu_date: z.string().min(1, "Menu date is required"),
   is_special: z.boolean().default(false),
   stock: z.coerce.number().min(0),
   status: z.coerce.number().default(1),
@@ -28,7 +38,8 @@ const productSchema = z.object({
 type ProductFormData = z.infer<typeof productSchema>;
 
 export default function MenuManagement() {
-  const { data: products, isLoading } = useAdminListProducts();
+  const [selectedMenuDate, setSelectedMenuDate] = useState(todayIsoDate());
+  const { data: products, isLoading } = useAdminListProducts({ menu_date: selectedMenuDate });
   const { data: categories } = useAdminListCategories();
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -37,7 +48,7 @@ export default function MenuManagement() {
 
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
-    defaultValues: { name: "", description: "", price: "", image_url: "", category_id: "", is_special: false, stock: 0, status: 1 },
+    defaultValues: { name: "", description: "", price: "", image_url: "", category_id: "", menu_date: todayIsoDate(), is_special: false, stock: 0, status: 1 },
   });
 
   const createProduct = useCreateProduct({
@@ -74,13 +85,14 @@ export default function MenuManagement() {
         price: product.price,
         image_url: product.image_url || "",
         category_id: product.category_id?.toString() || "",
+        menu_date: product.menu_date?.slice(0, 10) || todayIsoDate(),
         is_special: product.is_special,
         stock: product.stock,
         status: product.status,
       });
     } else {
       setEditProduct(null);
-      form.reset({ name: "", description: "", price: "", image_url: "", category_id: "", is_special: false, stock: 0, status: 1 });
+      form.reset({ name: "", description: "", price: "", image_url: "", category_id: "", menu_date: selectedMenuDate, is_special: false, stock: 0, status: 1 });
     }
     setShowModal(true);
   };
@@ -100,12 +112,27 @@ export default function MenuManagement() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "Poppins, sans-serif" }}>Menu Management</h1>
-            <p className="text-sm text-muted-foreground">Manage your menu items and availability</p>
+            <p className="text-sm text-muted-foreground">Manage daily menu items and availability</p>
           </div>
-          <Button className="bg-primary hover:bg-primary/90 text-white" onClick={() => handleOpenModal()} data-testid="btn-add-product">
-            <Plus className="w-4 h-4 mr-2" /> Add New Item
-          </Button>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <label htmlFor="admin-menu-date" className="text-sm text-muted-foreground whitespace-nowrap">Menu date</label>
+              <Input
+                id="admin-menu-date"
+                type="date"
+                min={todayIsoDate()}
+                value={selectedMenuDate}
+                onChange={(e) => setSelectedMenuDate(e.target.value)}
+                className="w-[180px]"
+                data-testid="input-admin-menu-date"
+              />
+            </div>
+            <Button className="bg-primary hover:bg-primary/90 text-white" onClick={() => handleOpenModal()} data-testid="btn-add-product">
+              <Plus className="w-4 h-4 mr-2" /> Add New Item
+            </Button>
+          </div>
         </div>
+        <p className="text-sm text-primary mb-4">Showing items for: {formatMenuDateLabel(selectedMenuDate)}</p>
 
         <div className="bg-card border border-card-border rounded-xl overflow-hidden">
           <div className="p-4 border-b border-border">
@@ -120,6 +147,7 @@ export default function MenuManagement() {
                   <tr>
                     <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Item Name</th>
                     <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Category</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Menu Date</th>
                     <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Price</th>
                     <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Stock</th>
                     <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Status</th>
@@ -134,6 +162,7 @@ export default function MenuManagement() {
                         {product.is_special && <span className="text-xs text-green-600 font-medium">Today's Special</span>}
                       </td>
                       <td className="px-4 py-3 text-muted-foreground">{product.category_name || "—"}</td>
+                      <td className="px-4 py-3 text-muted-foreground">{formatMenuDateLabel(product.menu_date.slice(0, 10))}</td>
                       <td className="px-4 py-3 font-medium">&#x20B9;{product.price}</td>
                       <td className="px-4 py-3 text-muted-foreground">{product.stock} units</td>
                       <td className="px-4 py-3">
@@ -200,6 +229,20 @@ export default function MenuManagement() {
                           {categories?.map(c => <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>)}
                         </SelectContent>
                       </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                  <FormField control={form.control} name="menu_date" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Menu Date</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="date"
+                          min={todayIsoDate()}
+                          {...field}
+                          data-testid="input-product-menu-date"
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )} />

@@ -13,6 +13,7 @@ export interface ProductWithCategory {
   price: string;
   image_url?: string | null;
   category_id?: number | null;
+  menu_date: Date;
   category_name?: string | null;
   is_special: boolean;
   stock: number;

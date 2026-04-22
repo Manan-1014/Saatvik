@@ -64,6 +64,7 @@ export interface ProductWithCategory {
   price: string;
   image_url?: string | null;
   category_id?: number | null;
+  menu_date: string;
   category_name?: string | null;
   is_special: boolean;
   stock: number;
@@ -77,6 +78,7 @@ export interface ProductBody {
   price: string;
   image_url?: string | null;
   category_id?: number | null;
+  menu_date: string;
   is_special?: boolean;
   stock: number;
   status?: number;
@@ -329,7 +331,18 @@ export interface InventoryTransactionBody {
 
 export type ListProductsParams = {
   category_id?: number;
+  /**
+   * Menu day in YYYY-MM-DD (defaults to today)
+   */
+  menu_date?: string;
   search?: string;
+};
+
+export type AdminListProductsParams = {
+  /**
+   * Filter admin list by menu day in YYYY-MM-DD (defaults to today)
+   */
+  menu_date?: string;
 };
 
 export type AdminListOrdersParams = {

@@ -20,6 +20,7 @@ import type {
   AddToCartBody,
   AdminListInventoryTransactionsParams,
   AdminListOrdersParams,
+  AdminListProductsParams,
   AuthResponse,
   CartWithItems,
   Category,
@@ -971,41 +972,60 @@ export function useGetProduct<
 /**
  * @summary Admin - list all products
  */
-export const getAdminListProductsUrl = () => {
-  return `/api/admin/products`;
+export const getAdminListProductsUrl = (params?: AdminListProductsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/admin/products?${stringifiedParams}`
+    : `/api/admin/products`;
 };
 
 export const adminListProducts = async (
+  params?: AdminListProductsParams,
   options?: RequestInit,
 ): Promise<ProductWithCategory[]> => {
-  return customFetch<ProductWithCategory[]>(getAdminListProductsUrl(), {
+  return customFetch<ProductWithCategory[]>(getAdminListProductsUrl(params), {
     ...options,
     method: "GET",
   });
 };
 
-export const getAdminListProductsQueryKey = () => {
-  return [`/api/admin/products`] as const;
+export const getAdminListProductsQueryKey = (
+  params?: AdminListProductsParams,
+) => {
+  return [`/api/admin/products`, ...(params ? [params] : [])] as const;
 };
 
 export const getAdminListProductsQueryOptions = <
   TData = Awaited<ReturnType<typeof adminListProducts>>,
   TError = ErrorType<unknown>,
->(options?: {
-  query?: UseQueryOptions<
-    Awaited<ReturnType<typeof adminListProducts>>,
-    TError,
-    TData
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}) => {
+>(
+  params?: AdminListProductsParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof adminListProducts>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getAdminListProductsQueryKey();
+  const queryKey =
+    queryOptions?.queryKey ?? getAdminListProductsQueryKey(params);
 
   const queryFn: QueryFunction<
     Awaited<ReturnType<typeof adminListProducts>>
-  > = ({ signal }) => adminListProducts({ signal, ...requestOptions });
+  > = ({ signal }) => adminListProducts(params, { signal, ...requestOptions });
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof adminListProducts>>,
@@ -1026,15 +1046,18 @@ export type AdminListProductsQueryError = ErrorType<unknown>;
 export function useAdminListProducts<
   TData = Awaited<ReturnType<typeof adminListProducts>>,
   TError = ErrorType<unknown>,
->(options?: {
-  query?: UseQueryOptions<
-    Awaited<ReturnType<typeof adminListProducts>>,
-    TError,
-    TData
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getAdminListProductsQueryOptions(options);
+>(
+  params?: AdminListProductsParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof adminListProducts>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getAdminListProductsQueryOptions(params, options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
     queryKey: QueryKey;

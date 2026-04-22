@@ -219,6 +219,12 @@ paths:
           in: query
           schema:
             type: integer
+        - name: menu_date
+          in: query
+          description: Menu day in YYYY-MM-DD (defaults to today)
+          schema:
+            type: string
+            format: date
         - name: search
           in: query
           schema:
@@ -259,6 +265,13 @@ paths:
       summary: Admin - list all products
       security:
         - bearerAuth: []
+      parameters:
+        - name: menu_date
+          in: query
+          description: Filter admin list by menu day in YYYY-MM-DD (defaults to today)
+          schema:
+            type: string
+            format: date
       responses:
         "200":
           description: All products
@@ -1362,6 +1375,9 @@ components:
         category_id:
           type: integer
           nullable: true
+        menu_date:
+          type: string
+          format: date
         category_name:
           type: string
           nullable: true
@@ -1378,6 +1394,7 @@ components:
         - id
         - name
         - price
+        - menu_date
         - is_special
         - stock
         - status
@@ -1398,6 +1415,9 @@ components:
         category_id:
           type: integer
           nullable: true
+        menu_date:
+          type: string
+          format: date
         is_special:
           type: boolean
         stock:
@@ -1407,6 +1427,7 @@ components:
       required:
         - name
         - price
+        - menu_date
         - stock
 
     # CART

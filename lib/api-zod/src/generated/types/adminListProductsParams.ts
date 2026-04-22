@@ -6,11 +6,9 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type ListProductsParams = {
-  category_id?: number;
+export type AdminListProductsParams = {
   /**
-   * Menu day in YYYY-MM-DD (defaults to today)
+   * Filter admin list by menu day in YYYY-MM-DD (defaults to today)
    */
   menu_date?: Date;
-  search?: string;
 };

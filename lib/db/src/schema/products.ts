@@ -1,6 +1,7 @@
-import { pgTable, serial, varchar, text, decimal, integer, boolean, smallint, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, serial, varchar, text, decimal, integer, boolean, smallint, timestamp, date } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
+import { sql } from "drizzle-orm";
 import { categoriesTable } from "./categories";
 
 export const productsTable = pgTable("products", {
@@ -10,6 +11,7 @@ export const productsTable = pgTable("products", {
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),
   imageUrl: text("image_url"),
   categoryId: integer("category_id").references(() => categoriesTable.id),
+  menuDate: date("menu_date").notNull().default(sql`CURRENT_DATE`),
   isSpecial: boolean("is_special").default(false),
   stock: integer("stock").default(0),
   status: smallint("status").default(1),

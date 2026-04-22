@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { Leaf, Phone, MapPin, Clock, Instagram, Facebook } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -50,14 +51,34 @@ function WhatsAppGlyph({ className }: { className?: string }) {
 
 export function Footer() {
   const { data: settings } = useGetSettings();
+  const footerRef = useRef<HTMLElement | null>(null);
   const phoneDisplay = settings?.contact_number?.trim() || "+91 98765 43210";
   const waDigits = digitsOnly(phoneDisplay);
   const waHref = waDigits ? `https://wa.me/${waDigits.startsWith("91") ? waDigits : `91${waDigits}`}` : "https://wa.me/919876543210";
   const telHref = `tel:${digitsOnly(phoneDisplay) || "919876543210"}`;
   const cutoff = formatCutoffTime(settings?.order_cutoff_time);
+  useEffect(() => {
+    if (!footerRef.current) return;
+    const target = footerRef.current;
+    const observer = new IntersectionObserver(
+      (entries, obs) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const node = entry.target as HTMLElement;
+          if (!node.classList.contains("animated")) {
+            node.classList.add("animated");
+          }
+          obs.unobserve(node);
+        });
+      },
+      { threshold: 0.15 },
+    );
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <footer className="bg-[#2c1810] text-white/90" data-testid="site-footer">
+    <footer ref={footerRef} className="bg-[#2c1810] text-white/90 footer-scroll-anim" data-testid="site-footer">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 lg:py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
           {/* Brand */}
@@ -79,14 +100,14 @@ export function Footer() {
                 href={waHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-lg bg-[#25D366] text-white flex items-center justify-center hover:opacity-90 transition-opacity"
+                className="w-10 h-10 rounded-lg text-white flex items-center justify-center footer-social-icon footer-social-whatsapp"
                 aria-label="WhatsApp"
               >
                 <WhatsAppGlyph className="w-5 h-5" />
               </a>
               <a
                 href={telHref}
-                className="w-10 h-10 rounded-lg bg-primary text-white flex items-center justify-center hover:bg-primary/90 transition-colors"
+                className="w-10 h-10 rounded-lg text-white flex items-center justify-center footer-social-icon footer-social-phone"
                 aria-label="Call us"
               >
                 <Phone className="w-5 h-5" />
@@ -95,7 +116,7 @@ export function Footer() {
                 href="https://www.instagram.com/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#f58529] via-[#dd2a7b] to-[#8134af] text-white flex items-center justify-center hover:opacity-90 transition-opacity"
+                className="w-10 h-10 rounded-lg text-white flex items-center justify-center footer-social-icon footer-social-instagram"
                 aria-label="Instagram"
               >
                 <Instagram className="w-5 h-5" />
@@ -104,7 +125,7 @@ export function Footer() {
                 href="https://www.facebook.com/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-lg bg-[#1877f2] text-white flex items-center justify-center hover:opacity-90 transition-opacity"
+                className="w-10 h-10 rounded-lg text-white flex items-center justify-center footer-social-icon footer-social-facebook"
                 aria-label="Facebook"
               >
                 <Facebook className="w-5 h-5" />
@@ -167,7 +188,7 @@ export function Footer() {
             </ul>
             <Button
               asChild
-              className="mt-6 w-full sm:w-auto bg-[#25D366] hover:bg-[#20bd5a] text-white font-medium rounded-xl"
+              className="mt-6 w-full sm:w-auto bg-[#25D366] hover:bg-[#20bd5a] text-white font-medium rounded-xl pulse-cta"
             >
               <a href={waHref} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2">
                 <WhatsAppGlyph className="w-5 h-5" />

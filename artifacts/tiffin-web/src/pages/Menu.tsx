@@ -9,9 +9,19 @@ import { useLocation } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 
+function todayIsoDate() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function formatMenuDateLabel(value: string) {
+  const d = new Date(`${value}T00:00:00`);
+  return d.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short", year: "numeric" });
+}
+
 export default function Menu() {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<number | undefined>();
+  const [selectedMenuDate, setSelectedMenuDate] = useState(todayIsoDate());
   const [availableOnly, setAvailableOnly] = useState(false);
   const { isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
@@ -19,7 +29,11 @@ export default function Menu() {
   const queryClient = useQueryClient();
 
   const { data: categories } = useListCategories();
-  const { data: products, isLoading } = useListProducts({ category_id: selectedCategory, search: search || undefined });
+  const { data: products, isLoading } = useListProducts({
+    category_id: selectedCategory,
+    menu_date: selectedMenuDate,
+    search: search || undefined,
+  });
 
   const addToCart = useAddToCart({
     mutation: {
@@ -49,6 +63,9 @@ export default function Menu() {
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-foreground mb-2" style={{ fontFamily: "Poppins, sans-serif" }}>Our Menu</h1>
           <p className="text-muted-foreground">Every item is prepared fresh daily — strictly no onion, garlic, or root vegetables.</p>
+          <p className="text-sm text-primary font-medium mt-2">
+            Showing menu for: {formatMenuDateLabel(selectedMenuDate)}
+          </p>
         </div>
 
         {/* Search & Filter */}
@@ -72,6 +89,20 @@ export default function Menu() {
           >
             Available Only
           </Button>
+          <div className="flex items-center gap-2">
+            <label htmlFor="menu-date" className="text-sm text-muted-foreground whitespace-nowrap">
+              Menu date
+            </label>
+            <Input
+              id="menu-date"
+              type="date"
+              min={todayIsoDate()}
+              value={selectedMenuDate}
+              onChange={(e) => setSelectedMenuDate(e.target.value)}
+              className="w-[180px]"
+              data-testid="input-menu-date"
+            />
+          </div>
         </div>
 
         {/* Category Pills */}

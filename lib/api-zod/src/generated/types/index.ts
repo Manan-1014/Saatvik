@@ -9,6 +9,7 @@
 export * from "./addToCartBody";
 export * from "./adminListInventoryTransactionsParams";
 export * from "./adminListOrdersParams";
+export * from "./adminListProductsParams";
 export * from "./authResponse";
 export * from "./cartItem";
 export * from "./cartWithItems";
