@@ -5,6 +5,7 @@ import { CreateOrderBody, UpdateOrderStatusBody, AdminListOrdersQueryParams } fr
 import { authenticate, requireAdmin, type AuthRequest } from "../middlewares/auth";
 
 const router: IRouter = Router();
+type FulfillmentType = "DELIVERY" | "TAKE_AWAY" | "DINE_IN";
 
 async function buildOrderResponse(order: any) {
   const items = await db
@@ -46,11 +47,25 @@ router.post("/orders", authenticate, async (req: AuthRequest, res): Promise<void
     return;
   }
 
-  // Check delivery area is active
-  const [area] = await db.select().from(deliveryAreasTable).where(eq(deliveryAreasTable.id, parsed.data.delivery_area_id)).limit(1);
-  if (!area || area.status !== 1) {
-    res.status(400).json({ error: "Selected delivery area is not available" });
-    return;
+  const fulfillmentType = (parsed.data.fulfillment_type ?? "DELIVERY") as FulfillmentType;
+  const isDelivery = fulfillmentType === "DELIVERY";
+
+  let area: typeof deliveryAreasTable.$inferSelect | undefined;
+  if (isDelivery) {
+    if (parsed.data.delivery_area_id == null) {
+      res.status(400).json({ error: "delivery_area_id is required for delivery orders" });
+      return;
+    }
+    const [activeArea] = await db
+      .select()
+      .from(deliveryAreasTable)
+      .where(eq(deliveryAreasTable.id, parsed.data.delivery_area_id))
+      .limit(1);
+    if (!activeArea || activeArea.status !== 1) {
+      res.status(400).json({ error: "Selected delivery area is not available" });
+      return;
+    }
+    area = activeArea;
   }
 
   // Get cart items
@@ -69,7 +84,7 @@ router.post("/orders", authenticate, async (req: AuthRequest, res): Promise<void
   }
 
   const subtotal = cartItems.reduce((sum, row) => sum + (parseFloat(row.products?.price || row.snacks?.price || "0") * row.cart_items.quantity), 0);
-  const deliveryCharge = parseFloat(area.deliveryCharge.toString());
+  const deliveryCharge = isDelivery ? parseFloat(area!.deliveryCharge.toString()) : 0;
   const total = subtotal + deliveryCharge;
 
   // Determine delivery date
@@ -86,7 +101,8 @@ router.post("/orders", authenticate, async (req: AuthRequest, res): Promise<void
 
   const [order] = await db.insert(ordersTable).values({
     userId: req.user!.id,
-    deliveryAreaId: parsed.data.delivery_area_id,
+    fulfillmentType,
+    deliveryAreaId: isDelivery ? parsed.data.delivery_area_id! : null,
     deliveryCharge: deliveryCharge.toFixed(2),
     subtotal: subtotal.toFixed(2),
     total: total.toFixed(2),
@@ -124,6 +140,7 @@ async function getOrderWithMeta(orderId: number) {
       customer_name: usersTable.name,
       customer_phone: usersTable.phone,
       delivery_area_id: ordersTable.deliveryAreaId,
+      fulfillment_type: ordersTable.fulfillmentType,
       delivery_area_name: deliveryAreasTable.name,
       delivery_charge: ordersTable.deliveryCharge,
       subtotal: ordersTable.subtotal,
@@ -152,6 +169,7 @@ router.get("/orders/my", authenticate, async (req: AuthRequest, res): Promise<vo
       customer_name: usersTable.name,
       customer_phone: usersTable.phone,
       delivery_area_id: ordersTable.deliveryAreaId,
+      fulfillment_type: ordersTable.fulfillmentType,
       delivery_area_name: deliveryAreasTable.name,
       delivery_charge: ordersTable.deliveryCharge,
       subtotal: ordersTable.subtotal,
@@ -186,6 +204,7 @@ router.get("/orders/track/:orderId", async (req, res): Promise<void> => {
     order_time: order.order_time,
     delivery_date: order.delivery_date,
     delivery_area_name: order.delivery_area_name,
+    fulfillment_type: order.fulfillment_type,
     items: order.items,
     total: order.total,
   });
@@ -200,6 +219,7 @@ router.get("/admin/orders", authenticate, requireAdmin, async (req, res): Promis
       customer_name: usersTable.name,
       customer_phone: usersTable.phone,
       delivery_area_id: ordersTable.deliveryAreaId,
+      fulfillment_type: ordersTable.fulfillmentType,
       delivery_area_name: deliveryAreasTable.name,
       delivery_charge: ordersTable.deliveryCharge,
       subtotal: ordersTable.subtotal,

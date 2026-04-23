@@ -7,6 +7,7 @@
  */
 
 export interface CreateOrderBody {
-  delivery_area_id: number;
+  fulfillment_type: "DELIVERY" | "TAKE_AWAY" | "DINE_IN";
+  delivery_area_id?: number;
   payment_method: string;
 }

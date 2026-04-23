@@ -24,7 +24,7 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
   const [compact, setCompact] = useState(false);
   const [location] = useLocation();
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, isAdmin, logout } = useAuth();
   const { data: cart } = useGetCart({ query: { enabled: isAuthenticated, queryKey: getGetCartQueryKey() } });
   useEffect(() => {
     let lastY = window.scrollY;
@@ -105,6 +105,13 @@ export function Navbar() {
           </div>
 
           <div className="flex items-center gap-3">
+            {isAdmin && (
+              <Link to="/admin" data-testid="nav-back-to-admin">
+                <Button variant="outline" size="sm" className="hidden sm:inline-flex">
+                  Back to Admin Panel
+                </Button>
+              </Link>
+            )}
             <Link to="/cart" className="relative" data-testid="nav-cart">
               <Button variant="ghost" size="icon" className="relative">
                 <ShoppingCart className="h-5 w-5" />
@@ -150,6 +157,11 @@ export function Navbar() {
             <Link to="/contact" className="block py-2 px-2 text-sm font-medium text-foreground hover:text-primary rounded-md" onClick={() => setOpen(false)}>
               Bulk orders &amp; catering
             </Link>
+            {isAdmin && (
+              <Link to="/admin" className="block py-2 px-2 text-sm font-medium text-foreground hover:text-primary rounded-md" onClick={() => setOpen(false)} data-testid="nav-mobile-back-to-admin">
+                Back to Admin Panel
+              </Link>
+            )}
           </div>
         )}
       </div>

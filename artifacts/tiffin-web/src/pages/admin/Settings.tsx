@@ -82,7 +82,7 @@ export default function Settings() {
                   <FormField control={form.control} name="order_cutoff_time" render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Input type="time" className="w-40" {...field} data-testid="input-cutoff-time" />
+                        <Input type="time" className="w-full sm:w-40 max-w-[12rem]" {...field} data-testid="input-cutoff-time" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -93,7 +93,7 @@ export default function Settings() {
 
             {/* Maintenance Mode */}
             <div className="bg-card border border-card-border rounded-xl p-6">
-              <div className="flex items-center gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
                 <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
                   <Settings2 className="w-5 h-5 text-primary" />
                 </div>
@@ -160,7 +160,7 @@ export default function Settings() {
               </div>
             </div>
 
-            <Button type="submit" className="bg-primary hover:bg-primary/90 text-white px-8" disabled={updateSettings.isPending} data-testid="btn-save-settings">
+            <Button type="submit" className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white px-8" disabled={updateSettings.isPending} data-testid="btn-save-settings">
               {updateSettings.isPending ? "Saving..." : "Save Settings"}
             </Button>
           </form>

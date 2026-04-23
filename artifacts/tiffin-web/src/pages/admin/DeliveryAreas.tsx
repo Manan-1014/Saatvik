@@ -59,18 +59,18 @@ export default function DeliveryAreas() {
   return (
     <AdminLayout>
       <div data-testid="admin-delivery-areas">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "Poppins, sans-serif" }}>Delivery Areas</h1>
             <p className="text-sm text-muted-foreground">Manage delivery areas and charges</p>
           </div>
-          <Button className="bg-primary hover:bg-primary/90 text-white" onClick={() => handleOpenModal()} data-testid="btn-add-area">
+          <Button className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white" onClick={() => handleOpenModal()} data-testid="btn-add-area">
             <Plus className="w-4 h-4 mr-2" /> Add Area
           </Button>
         </div>
 
         {isLoading ? (
-          <div className="grid grid-cols-3 gap-4 animate-pulse">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 animate-pulse">
             {[1,2,3,4,5,6].map(i => <div key={i} className="h-36 bg-muted rounded-xl" />)}
           </div>
         ) : (
@@ -91,11 +91,11 @@ export default function DeliveryAreas() {
                     Deliveries Disabled
                   </div>
                 )}
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" className="flex-1 text-xs h-8" onClick={() => handleOpenModal(area)} data-testid={`btn-edit-area-${area.id}`}>
+                <div className="flex flex-col xs:flex-row gap-2">
+                  <Button variant="outline" size="sm" className="flex-1 text-xs min-h-9" onClick={() => handleOpenModal(area)} data-testid={`btn-edit-area-${area.id}`}>
                     <Pencil className="w-3 h-3 mr-1" /> Edit
                   </Button>
-                  <Button variant="outline" size="sm" className="flex-1 text-xs h-8 text-destructive border-destructive/30 hover:bg-destructive/10" onClick={() => deleteArea.mutate({ id: area.id })} data-testid={`btn-delete-area-${area.id}`}>
+                  <Button variant="outline" size="sm" className="flex-1 text-xs min-h-9 text-destructive border-destructive/30 hover:bg-destructive/10" onClick={() => deleteArea.mutate({ id: area.id })} data-testid={`btn-delete-area-${area.id}`}>
                     <Trash2 className="w-3 h-3 mr-1" /> Delete
                   </Button>
                 </div>
@@ -138,9 +138,9 @@ export default function DeliveryAreas() {
                     <FormMessage />
                   </FormItem>
                 )} />
-                <div className="flex justify-end gap-2 pt-2">
-                  <Button type="button" variant="outline" onClick={() => setShowModal(false)}>Cancel</Button>
-                  <Button type="submit" className="bg-primary text-white" disabled={createArea.isPending || updateArea.isPending} data-testid="btn-save-area">
+                <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2">
+                  <Button type="button" variant="outline" onClick={() => setShowModal(false)} className="w-full sm:w-auto">Cancel</Button>
+                  <Button type="submit" className="w-full sm:w-auto bg-primary text-white" disabled={createArea.isPending || updateArea.isPending} data-testid="btn-save-area">
                     {createArea.isPending || updateArea.isPending ? "Saving..." : "Save"}
                   </Button>
                 </div>

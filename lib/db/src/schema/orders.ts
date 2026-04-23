@@ -9,6 +9,7 @@ import { snacksTable } from "./snacks";
 export const ordersTable = pgTable("orders", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => usersTable.id),
+  fulfillmentType: varchar("fulfillment_type", { length: 20 }).notNull().default("DELIVERY"),
   deliveryAreaId: integer("delivery_area_id").references(() => deliveryAreasTable.id),
   deliveryCharge: decimal("delivery_charge", { precision: 10, scale: 2 }).notNull().default("0"),
   subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull().default("0"),

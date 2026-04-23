@@ -54,12 +54,12 @@ export default function InventoryManagement() {
   return (
     <AdminLayout>
       <div data-testid="admin-inventory">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "Poppins, sans-serif" }}>Inventory Management</h1>
             <p className="text-sm text-muted-foreground">Manage and track snack stock levels</p>
           </div>
-          <Button className="bg-primary hover:bg-primary/90 text-white" onClick={() => setShowModal(true)}>
+          <Button className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white" onClick={() => setShowModal(true)}>
             <Plus className="w-4 h-4 mr-2" /> Log Transaction
           </Button>
         </div>
@@ -73,12 +73,12 @@ export default function InventoryManagement() {
                     <div className="p-8 text-center text-muted-foreground">Loading...</div>
                 ) : (
                     <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
+                    <table className="w-full min-w-[700px] text-sm">
                         <thead className="bg-muted/40">
                         <tr>
-                            <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Snack</th>
-                            <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Available Quantity</th>
-                            <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Last Updated</th>
+                            <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Snack</th>
+                            <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Available Quantity</th>
+                            <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Last Updated</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -86,13 +86,13 @@ export default function InventoryManagement() {
                             const snack = snacks?.find(s => s.id === inv.snackId);
                             return (
                                 <tr key={inv.snackId} className="border-t border-border/50 hover:bg-muted/20 transition-colors">
-                                <td className="px-4 py-3">
+                                <td className="px-4 py-3 whitespace-nowrap">
                                     <div className="font-medium text-foreground">{snack?.name || `Product ID ${inv.snackId}`}</div>
                                 </td>
-                                <td className="px-4 py-3 font-medium">
+                                <td className="px-4 py-3 font-medium whitespace-nowrap">
                                     <span className={inv.quantity < 10 ? "text-red-500" : ""}>{inv.quantity}</span>
                                 </td>
-                                <td className="px-4 py-3 text-muted-foreground">{inv.updatedAt ? new Date(inv.updatedAt).toLocaleString() : 'N/A'}</td>
+                                <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{inv.updatedAt ? new Date(inv.updatedAt).toLocaleString() : 'N/A'}</td>
                                 </tr>
                             )
                         })}
@@ -110,24 +110,24 @@ export default function InventoryManagement() {
                     <div className="p-8 text-center text-muted-foreground">Loading...</div>
                 ) : (
                     <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
+                    <table className="w-full min-w-[640px] text-sm">
                         <thead className="bg-muted/40">
                         <tr>
-                            <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Snack</th>
-                            <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Type</th>
-                            <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Qty</th>
-                            <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Note</th>
+                            <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Snack</th>
+                            <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Type</th>
+                            <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Qty</th>
+                            <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Note</th>
                         </tr>
                         </thead>
                         <tbody>
                         {transactions?.map(tx => (
                             <tr key={tx.id} className="border-t border-border/50 hover:bg-muted/20 transition-colors">
-                                <td className="px-4 py-3 text-foreground">{tx.Snack?.name || `ID ${tx.snackId}`}</td>
-                                <td className="px-4 py-3">
+                                <td className="px-4 py-3 text-foreground whitespace-nowrap">{tx.Snack?.name || `ID ${tx.snackId}`}</td>
+                                <td className="px-4 py-3 whitespace-nowrap">
                                     <span className={`text-xs px-2 py-1 rounded-full ${tx.type === 'ADD' ? 'bg-green-100 text-green-800' : tx.type === 'SALE' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'}`}>{tx.type}</span>
                                 </td>
-                                <td className="px-4 py-3 font-medium">{tx.quantity}</td>
-                                <td className="px-4 py-3 text-muted-foreground truncate max-w-[100px]">{tx.note || "—"}</td>
+                                <td className="px-4 py-3 font-medium whitespace-nowrap">{tx.quantity}</td>
+                                <td className="px-4 py-3 text-muted-foreground truncate max-w-[140px] sm:max-w-[220px]">{tx.note || "—"}</td>
                             </tr>
                         ))}
                         </tbody>
@@ -139,7 +139,7 @@ export default function InventoryManagement() {
 
         {/* Modal */}
         <Dialog open={showModal} onOpenChange={setShowModal}>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Log Inventory Transaction</DialogTitle>
             </DialogHeader>
@@ -157,7 +157,7 @@ export default function InventoryManagement() {
                       <FormMessage />
                     </FormItem>
                   )} />
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <FormField control={form.control} name="type" render={({ field }) => (
                         <FormItem>
                         <FormLabel>Transaction Type</FormLabel>
@@ -187,9 +187,9 @@ export default function InventoryManagement() {
                       <FormMessage />
                     </FormItem>
                   )} />
-                <div className="flex justify-end gap-2 pt-2">
-                  <Button type="button" variant="outline" onClick={() => setShowModal(false)}>Cancel</Button>
-                  <Button type="submit" className="bg-primary text-white" disabled={createTransaction.isPending}>
+                <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2">
+                  <Button type="button" variant="outline" onClick={() => setShowModal(false)} className="w-full sm:w-auto">Cancel</Button>
+                  <Button type="submit" className="w-full sm:w-auto bg-primary text-white" disabled={createTransaction.isPending}>
                     {createTransaction.isPending ? "Logging..." : "Log Transaction"}
                   </Button>
                 </div>

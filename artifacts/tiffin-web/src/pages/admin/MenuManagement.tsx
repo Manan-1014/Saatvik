@@ -109,25 +109,25 @@ export default function MenuManagement() {
   return (
     <AdminLayout>
       <div data-testid="admin-menu">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "Poppins, sans-serif" }}>Menu Management</h1>
             <p className="text-sm text-muted-foreground">Manage daily menu items and availability</p>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <label htmlFor="admin-menu-date" className="text-sm text-muted-foreground whitespace-nowrap">Menu date</label>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 w-full lg:w-auto">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 w-full sm:w-auto">
+              <label htmlFor="admin-menu-date" className="text-sm text-muted-foreground sm:whitespace-nowrap">Menu date</label>
               <Input
                 id="admin-menu-date"
                 type="date"
                 min={todayIsoDate()}
                 value={selectedMenuDate}
                 onChange={(e) => setSelectedMenuDate(e.target.value)}
-                className="w-[180px]"
+                className="w-full sm:w-[180px]"
                 data-testid="input-admin-menu-date"
               />
             </div>
-            <Button className="bg-primary hover:bg-primary/90 text-white" onClick={() => handleOpenModal()} data-testid="btn-add-product">
+            <Button className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white" onClick={() => handleOpenModal()} data-testid="btn-add-product">
               <Plus className="w-4 h-4 mr-2" /> Add New Item
             </Button>
           </div>
@@ -142,37 +142,37 @@ export default function MenuManagement() {
             <div className="p-8 text-center text-muted-foreground">Loading...</div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[960px] text-sm">
                 <thead className="bg-muted/40">
                   <tr>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Item Name</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Category</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Menu Date</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Price</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Stock</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Status</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Actions</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Item Name</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Category</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Menu Date</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Price</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Stock</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Status</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {products?.map(product => (
                     <tr key={product.id} className="border-t border-border/50 hover:bg-muted/20 transition-colors" data-testid={`row-product-${product.id}`}>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 whitespace-nowrap">
                         <div className="font-medium text-foreground">{product.name}</div>
                         {product.is_special && <span className="text-xs text-green-600 font-medium">Today's Special</span>}
                       </td>
-                      <td className="px-4 py-3 text-muted-foreground">{product.category_name || "—"}</td>
-                      <td className="px-4 py-3 text-muted-foreground">{formatMenuDateLabel(product.menu_date.slice(0, 10))}</td>
-                      <td className="px-4 py-3 font-medium">&#x20B9;{product.price}</td>
-                      <td className="px-4 py-3 text-muted-foreground">{product.stock} units</td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{product.category_name || "—"}</td>
+                      <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{formatMenuDateLabel(product.menu_date.slice(0, 10))}</td>
+                      <td className="px-4 py-3 font-medium whitespace-nowrap">&#x20B9;{product.price}</td>
+                      <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{product.stock} units</td>
+                      <td className="px-4 py-3 whitespace-nowrap">
                         <Switch
                           checked={product.status === 1}
                           onCheckedChange={() => toggleStatus.mutate({ id: product.id })}
                           data-testid={`toggle-product-${product.id}`}
                         />
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 whitespace-nowrap">
                         <div className="flex gap-2">
                           <Button variant="ghost" size="icon" className="h-8 w-8 text-primary hover:text-primary/80" onClick={() => handleOpenModal(product)} data-testid={`btn-edit-product-${product.id}`}>
                             <Pencil className="w-3.5 h-3.5" />
@@ -192,13 +192,13 @@ export default function MenuManagement() {
 
         {/* Modal */}
         <Dialog open={showModal} onOpenChange={setShowModal}>
-          <DialogContent className="max-w-lg">
+          <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{editProduct ? "Edit Item" : "Add New Item"}</DialogTitle>
             </DialogHeader>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <FormField control={form.control} name="name" render={({ field }) => (
                     <FormItem className="col-span-2">
                       <FormLabel>Name</FormLabel>
@@ -279,9 +279,9 @@ export default function MenuManagement() {
                     </FormItem>
                   )} />
                 </div>
-                <div className="flex justify-end gap-2 pt-2">
-                  <Button type="button" variant="outline" onClick={() => setShowModal(false)}>Cancel</Button>
-                  <Button type="submit" className="bg-primary text-white" disabled={createProduct.isPending || updateProduct.isPending} data-testid="btn-save-product">
+                <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2">
+                  <Button type="button" variant="outline" onClick={() => setShowModal(false)} className="w-full sm:w-auto">Cancel</Button>
+                  <Button type="submit" className="w-full sm:w-auto bg-primary text-white" disabled={createProduct.isPending || updateProduct.isPending} data-testid="btn-save-product">
                     {createProduct.isPending || updateProduct.isPending ? "Saving..." : "Save Item"}
                   </Button>
                 </div>

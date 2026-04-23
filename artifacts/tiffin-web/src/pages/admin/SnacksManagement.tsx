@@ -29,6 +29,7 @@ const snackSchema = z.object({
   name: z.string().min(1, "Name required"),
   description: z.string().optional(),
   price: z.coerce.number().min(0, "Invalid price"),
+  stock: z.coerce.number().int().min(0, "Stock cannot be negative"),
   imageUrl: z.string().optional(),
   snackCategoryId: z.coerce.number().min(1, "Snack category required"),
   weight: z.string().optional(),
@@ -47,7 +48,7 @@ export default function SnacksManagement() {
 
   const form = useForm<SnackFormData>({
     resolver: zodResolver(snackSchema),
-    defaultValues: { name: "", description: "", price: 0, imageUrl: "", snackCategoryId: 0, weight: "", status: 1 },
+    defaultValues: { name: "", description: "", price: 0, stock: 0, imageUrl: "", snackCategoryId: 0, weight: "", status: 1 },
   });
 
   const stockMut = useCreateInventoryTransaction({
@@ -112,6 +113,7 @@ export default function SnacksManagement() {
         name: snack.name,
         description: snack.description || "",
         price: parseFloat(snack.price) || 0,
+        stock: snack.Inventory?.quantity ?? 0,
         imageUrl: snack.imageUrl || "",
         snackCategoryId: snack.snackCategoryId || 0,
         weight: snack.weight || "",
@@ -119,16 +121,39 @@ export default function SnacksManagement() {
       });
     } else {
       setEditSnack(null);
-      form.reset({ name: "", description: "", price: 0, imageUrl: "", snackCategoryId: 0, weight: "", status: 1 });
+      form.reset({ name: "", description: "", price: 0, stock: 0, imageUrl: "", snackCategoryId: 0, weight: "", status: 1 });
     }
     setShowModal(true);
   };
 
   const handleSubmit = (data: SnackFormData) => {
+    const { stock, ...snackPayload } = data;
+
     if (editSnack) {
-      updateSnack.mutate({ id: editSnack.id, data });
+      const currentStock = editSnack.Inventory?.quantity ?? 0;
+      const delta = stock - currentStock;
+
+      updateSnack.mutate(
+        { id: editSnack.id, data: snackPayload },
+        {
+          onSuccess: () => {
+            if (delta !== 0) {
+              adjustStock(editSnack.id, delta > 0 ? "ADD" : "SALE", Math.abs(delta));
+            }
+          },
+        }
+      );
     } else {
-      createSnack.mutate({ data });
+      createSnack.mutate(
+        { data: snackPayload },
+        {
+          onSuccess: (createdSnack: any) => {
+            if (stock > 0 && createdSnack?.id) {
+              adjustStock(createdSnack.id, "ADD", stock);
+            }
+          },
+        }
+      );
     }
   };
 
@@ -146,14 +171,14 @@ export default function SnacksManagement() {
   return (
     <AdminLayout>
       <div data-testid="admin-snacks">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "Poppins, sans-serif" }}>
               Snacks Management
             </h1>
             <p className="text-sm text-muted-foreground">Manage snack items, stock, and snack categories from the sidebar.</p>
           </div>
-          <Button className="bg-primary hover:bg-primary/90 text-white" onClick={() => handleOpenModal()} data-testid="btn-add-snack">
+          <Button className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white" onClick={() => handleOpenModal()} data-testid="btn-add-snack">
             <Plus className="w-4 h-4 mr-2" /> Add New Snack
           </Button>
         </div>
@@ -166,16 +191,16 @@ export default function SnacksManagement() {
             <div className="p-8 text-center text-muted-foreground">Loading...</div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[980px] text-sm">
                 <thead className="bg-muted/40">
                   <tr>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Snack Name</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Category</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Weight</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Price</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Stock</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Status</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Actions</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Snack Name</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Category</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Weight</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Price</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Stock</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Status</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -183,19 +208,19 @@ export default function SnacksManagement() {
                     const qty = snack.Inventory?.quantity ?? 0;
                     return (
                       <tr key={snack.id} className="border-t border-border/50 hover:bg-muted/20 transition-colors" data-testid={`row-snack-${snack.id}`}>
-                        <td className="px-4 py-3">
+                        <td className="px-4 py-3 whitespace-nowrap">
                           <div className="font-medium text-foreground">{snack.name}</div>
                         </td>
-                        <td className="px-4 py-3 text-muted-foreground">{snack.SnackCategory?.name || "—"}</td>
-                        <td className="px-4 py-3 text-muted-foreground">{snack.weight || "—"}</td>
-                        <td className="px-4 py-3 font-medium">&#x20B9;{snack.price}</td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-1">
+                        <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{snack.SnackCategory?.name || "—"}</td>
+                        <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{snack.weight || "—"}</td>
+                        <td className="px-4 py-3 font-medium whitespace-nowrap">&#x20B9;{snack.price}</td>
+                        <td className="px-4 py-3 whitespace-nowrap">
+                          <div className="flex items-center gap-1.5 sm:gap-2">
                             <Button
                               type="button"
                               variant="outline"
                               size="icon"
-                              className="h-8 w-8 shrink-0"
+                              className="h-9 w-9 sm:h-8 sm:w-8 shrink-0"
                               disabled={stockMut.isPending || qty <= 0}
                               onClick={() => adjustStock(snack.id, "SALE", 1)}
                               title="Remove 1 from stock"
@@ -207,7 +232,7 @@ export default function SnacksManagement() {
                               type="button"
                               variant="outline"
                               size="icon"
-                              className="h-8 w-8 shrink-0"
+                              className="h-9 w-9 sm:h-8 sm:w-8 shrink-0"
                               disabled={stockMut.isPending}
                               onClick={() => adjustStock(snack.id, "ADD", 1)}
                               title="Add 1 to stock"
@@ -216,10 +241,10 @@ export default function SnacksManagement() {
                             </Button>
                           </div>
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-4 py-3 whitespace-nowrap">
                           <Switch checked={snack.status === 1} onCheckedChange={() => toggleStatus.mutate({ id: snack.id })} />
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-4 py-3 whitespace-nowrap">
                           <div className="flex gap-2">
                             <Button variant="ghost" size="icon" className="h-8 w-8 text-primary hover:text-primary/80" onClick={() => handleOpenModal(snack)}>
                               <Pencil className="w-3.5 h-3.5" />
@@ -239,13 +264,13 @@ export default function SnacksManagement() {
         </div>
 
         <Dialog open={showModal} onOpenChange={setShowModal}>
-          <DialogContent className="max-w-lg">
+          <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{editSnack ? "Edit Snack" : "Add New Snack"}</DialogTitle>
             </DialogHeader>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="name"
@@ -280,6 +305,19 @@ export default function SnacksManagement() {
                         <FormLabel>Weight (e.g., 200g)</FormLabel>
                         <FormControl>
                           <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="stock"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Stock</FormLabel>
+                        <FormControl>
+                          <Input type="number" min={0} step="1" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -356,11 +394,11 @@ export default function SnacksManagement() {
                     )}
                   />
                 </div>
-                <div className="flex justify-end gap-2 pt-2">
-                  <Button type="button" variant="outline" onClick={() => setShowModal(false)}>
+                <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2">
+                  <Button type="button" variant="outline" onClick={() => setShowModal(false)} className="w-full sm:w-auto">
                     Cancel
                   </Button>
-                  <Button type="submit" className="bg-primary text-white" disabled={createSnack.isPending || updateSnack.isPending}>
+                  <Button type="submit" className="w-full sm:w-auto bg-primary text-white" disabled={createSnack.isPending || updateSnack.isPending}>
                     {createSnack.isPending || updateSnack.isPending ? "Saving..." : "Save Snack"}
                   </Button>
                 </div>

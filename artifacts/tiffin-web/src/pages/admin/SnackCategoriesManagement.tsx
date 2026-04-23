@@ -103,17 +103,17 @@ export default function SnackCategoriesManagement() {
   return (
     <AdminLayout>
       <div data-testid="admin-snack-categories">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-foreground flex items-center gap-2" style={{ fontFamily: "Poppins, sans-serif" }}>
-              <Tags className="w-7 h-7 text-primary" />
+              <Tags className="w-6 h-6 sm:w-7 sm:h-7 text-primary" />
               Snack categories
             </h1>
             <p className="text-sm text-muted-foreground mt-1">
               Categories used on the Snacks Store page (separate from menu categories).
             </p>
           </div>
-          <Button className="bg-primary hover:bg-primary/90 text-white" onClick={() => openModal()}>
+          <Button className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white" onClick={() => openModal()}>
             <Plus className="w-4 h-4 mr-2" />
             Add category
           </Button>
@@ -124,28 +124,28 @@ export default function SnackCategoriesManagement() {
             <div className="p-8 text-center text-muted-foreground">Loading…</div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[760px] text-sm">
                 <thead className="bg-muted/40">
                   <tr>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Name</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Sort</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Status</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Actions</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Name</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Sort</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Status</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {rows?.map((r) => (
                     <tr key={r.id} className="border-t border-border/50">
-                      <td className="px-4 py-3 font-medium text-foreground">{r.name}</td>
-                      <td className="px-4 py-3 text-muted-foreground">{r.sortOrder}</td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 font-medium text-foreground whitespace-nowrap">{r.name}</td>
+                      <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{r.sortOrder}</td>
+                      <td className="px-4 py-3 whitespace-nowrap">
                         <span
                           className={`text-xs px-2 py-1 rounded-full ${r.status === 1 ? "bg-green-100 text-green-800" : r.status === 2 ? "bg-muted text-muted-foreground" : "bg-amber-100 text-amber-800"}`}
                         >
                           {r.status === 1 ? "Active" : r.status === 2 ? "Deleted" : "Hidden"}
                         </span>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 whitespace-nowrap">
                         <div className="flex gap-2">
                           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openModal(r)}>
                             <Pencil className="w-3.5 h-3.5" />
@@ -222,11 +222,11 @@ export default function SnackCategoriesManagement() {
                     </FormItem>
                   )}
                 />
-                <div className="flex justify-end gap-2 pt-2">
-                  <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2">
+                  <Button type="button" variant="outline" onClick={() => setOpen(false)} className="w-full sm:w-auto">
                     Cancel
                   </Button>
-                  <Button type="submit" className="bg-primary text-white" disabled={createMut.isPending || updateMut.isPending}>
+                  <Button type="submit" className="w-full sm:w-auto bg-primary text-white" disabled={createMut.isPending || updateMut.isPending}>
                     Save
                   </Button>
                 </div>

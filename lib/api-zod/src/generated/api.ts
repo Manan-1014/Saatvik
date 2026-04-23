@@ -567,7 +567,8 @@ export const ClearCartResponse = zod.object({
  * @summary Place an order
  */
 export const CreateOrderBody = zod.object({
-  delivery_area_id: zod.number(),
+  fulfillment_type: zod.enum(["DELIVERY", "TAKE_AWAY", "DINE_IN"]),
+  delivery_area_id: zod.number().optional(),
   payment_method: zod.string(),
 });
 
@@ -586,6 +587,7 @@ export const ListMyOrdersResponseItem = zod.object({
   total: zod.string(),
   status: zod.string(),
   payment_method: zod.string().nullish(),
+  fulfillment_type: zod.enum(["DELIVERY", "TAKE_AWAY", "DINE_IN"]),
   order_time: zod.coerce.date(),
   delivery_date: zod.string().nullish(),
   items: zod.array(
@@ -611,6 +613,7 @@ export const TrackOrderParams = zod.object({
 export const TrackOrderResponse = zod.object({
   id: zod.number(),
   status: zod.string(),
+  fulfillment_type: zod.enum(["DELIVERY", "TAKE_AWAY", "DINE_IN"]),
   order_time: zod.coerce.date(),
   delivery_date: zod.string().nullish(),
   delivery_area_name: zod.string().nullish(),
@@ -646,6 +649,7 @@ export const AdminListOrdersResponseItem = zod.object({
   total: zod.string(),
   status: zod.string(),
   payment_method: zod.string().nullish(),
+  fulfillment_type: zod.enum(["DELIVERY", "TAKE_AWAY", "DINE_IN"]),
   order_time: zod.coerce.date(),
   delivery_date: zod.string().nullish(),
   items: zod.array(
@@ -684,6 +688,7 @@ export const UpdateOrderStatusResponse = zod.object({
   total: zod.string(),
   status: zod.string(),
   payment_method: zod.string().nullish(),
+  fulfillment_type: zod.enum(["DELIVERY", "TAKE_AWAY", "DINE_IN"]),
   order_time: zod.coerce.date(),
   delivery_date: zod.string().nullish(),
   items: zod.array(
@@ -940,6 +945,7 @@ export const GetDashboardStatsResponse = zod.object({
       total: zod.string(),
       status: zod.string(),
       payment_method: zod.string().nullish(),
+      fulfillment_type: zod.enum(["DELIVERY", "TAKE_AWAY", "DINE_IN"]),
       order_time: zod.coerce.date(),
       delivery_date: zod.string().nullish(),
       items: zod.array(

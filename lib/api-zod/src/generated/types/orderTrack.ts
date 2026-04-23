@@ -10,6 +10,7 @@ import type { OrderItem } from "./orderItem";
 export interface OrderTrack {
   id: number;
   status: string;
+  fulfillment_type: "DELIVERY" | "TAKE_AWAY" | "DINE_IN";
   order_time: Date;
   delivery_date?: string | null;
   delivery_area_name?: string | null;

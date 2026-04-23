@@ -16,9 +16,12 @@ import { getRazorpayClient, getRazorpayEnvDiagnosticsForLog, getRazorpayKeySecre
 import { logger } from "../lib/logger";
 
 /** Snapshot stored on the payment row until Razorpay checkout completes */
+export type FulfillmentType = "DELIVERY" | "TAKE_AWAY" | "DINE_IN";
+
 export type CheckoutSnapshotV1 = {
   version: 1;
-  delivery_area_id: number;
+  fulfillment_type: FulfillmentType;
+  delivery_area_id: number | null;
   delivery_charge: string;
   subtotal: string;
   total: string;
@@ -48,16 +51,25 @@ async function computeDeliveryDateFromSettings(): Promise<string> {
 
 export async function buildCheckoutSnapshot(
   userId: number,
-  deliveryAreaId: number,
+  fulfillmentType: FulfillmentType,
+  deliveryAreaId?: number,
 ): Promise<{ ok: true; snapshot: CheckoutSnapshotV1; amountPaise: number } | { ok: false; error: string; status: number }> {
   const [settings] = await db.select().from(settingsTable).where(eq(settingsTable.status, 1)).limit(1);
   if (settings?.maintenanceMode) {
     return { ok: false, error: "Ordering is temporarily disabled for maintenance", status: 400 };
   }
 
-  const [area] = await db.select().from(deliveryAreasTable).where(eq(deliveryAreasTable.id, deliveryAreaId)).limit(1);
-  if (!area || area.status !== 1) {
-    return { ok: false, error: "Selected delivery area is not available", status: 400 };
+  const isDelivery = fulfillmentType === "DELIVERY";
+  let area: typeof deliveryAreasTable.$inferSelect | undefined;
+  if (isDelivery) {
+    if (deliveryAreaId == null) {
+      return { ok: false, error: "delivery_area_id is required for delivery orders", status: 400 };
+    }
+    const [activeArea] = await db.select().from(deliveryAreasTable).where(eq(deliveryAreasTable.id, deliveryAreaId)).limit(1);
+    if (!activeArea || activeArea.status !== 1) {
+      return { ok: false, error: "Selected delivery area is not available", status: 400 };
+    }
+    area = activeArea;
   }
 
   const [cart] = await db
@@ -94,11 +106,12 @@ export async function buildCheckoutSnapshot(
     });
   }
 
-  const deliveryCharge = parseFloat(area.deliveryCharge.toString());
+  const deliveryCharge = isDelivery ? parseFloat(area!.deliveryCharge.toString()) : 0;
   const total = subtotal + deliveryCharge;
   const snapshot: CheckoutSnapshotV1 = {
     version: 1,
-    delivery_area_id: deliveryAreaId,
+    fulfillment_type: fulfillmentType,
+    delivery_area_id: isDelivery ? deliveryAreaId! : null,
     delivery_charge: deliveryCharge.toFixed(2),
     subtotal: subtotal.toFixed(2),
     total: total.toFixed(2),
@@ -114,13 +127,14 @@ export async function buildCheckoutSnapshot(
  */
 export async function createRazorpayCheckout(
   userId: number,
-  deliveryAreaId: number,
+  fulfillmentType: FulfillmentType,
+  deliveryAreaId: number | undefined,
   clientAmountPaise: number | undefined,
 ): Promise<
   | { ok: true; razorpay_order_id: string; amount: number; currency: string }
   | { ok: false; error: string; status: number }
 > {
-  const built = await buildCheckoutSnapshot(userId, deliveryAreaId);
+  const built = await buildCheckoutSnapshot(userId, fulfillmentType, deliveryAreaId);
   if (!built.ok) {
     return built;
   }
@@ -157,7 +171,8 @@ export async function createRazorpayCheckout(
       receipt: `uid_${userId}_${Date.now()}`,
       notes: {
         user_id: String(userId),
-        delivery_area_id: String(deliveryAreaId),
+        delivery_area_id: deliveryAreaId != null ? String(deliveryAreaId) : "",
+        fulfillment_type: fulfillmentType,
       },
     })) as { id: string };
   } catch (err: unknown) {
@@ -215,7 +230,7 @@ export async function createRazorpayCheckout(
   try {
     await db.insert(paymentsTable).values({
       userId,
-      deliveryAreaId,
+      deliveryAreaId: built.snapshot.delivery_area_id,
       orderId: null,
       checkoutSnapshot: JSON.stringify(built.snapshot),
       razorpayOrderId: rzpOrder.id,
@@ -286,6 +301,7 @@ async function finalizeCheckoutFromSnapshotPayment(
     .insert(ordersTable)
     .values({
       userId,
+      fulfillmentType: snapshot.fulfillment_type,
       deliveryAreaId: snapshot.delivery_area_id,
       deliveryCharge: snapshot.delivery_charge,
       subtotal: snapshot.subtotal,

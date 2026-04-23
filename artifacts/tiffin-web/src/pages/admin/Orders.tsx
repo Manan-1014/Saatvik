@@ -43,7 +43,7 @@ export default function Orders() {
         </div>
 
         {/* Tabs */}
-        <div className="flex flex-wrap gap-2 mb-6">
+        <div className="flex overflow-x-auto gap-2 pb-1 mb-6">
           {filterTabs.map((tab, i) => {
             const val = i === 0 ? undefined : STATUSES[i - 1];
             const isActive = filter === val;
@@ -51,7 +51,7 @@ export default function Orders() {
               <button
                 key={tab}
                 onClick={() => setFilter(val)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${isActive ? "bg-primary text-white" : "bg-card border border-border text-foreground hover:bg-muted"}`}
+                className={`shrink-0 min-h-9 px-3 sm:px-4 py-2 rounded-full text-sm font-medium transition-colors ${isActive ? "bg-primary text-white" : "bg-card border border-border text-foreground hover:bg-muted"}`}
                 data-testid={`filter-${tab.toLowerCase().replace(" ", "-")}`}
               >
                 {tab}
@@ -68,42 +68,42 @@ export default function Orders() {
             <div className="p-8 text-center text-muted-foreground">Loading orders...</div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[980px] text-sm">
                 <thead className="bg-muted/40">
                   <tr>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Order ID</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Customer</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Area</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Items</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Payment</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Total</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Status</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Order ID</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Customer</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Area</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Items</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Payment</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Total</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {orders?.map(order => (
                     <tr key={order.id} className="border-t border-border/50 hover:bg-muted/20 transition-colors" data-testid={`row-order-${order.id}`}>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 whitespace-nowrap">
                         <div className="font-medium text-foreground">ORD{String(order.id).padStart(8, "0")}</div>
                         <div className="text-xs text-muted-foreground">{new Date(order.order_time).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}</div>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 whitespace-nowrap">
                         <div className="font-medium text-foreground">{order.customer_name || "Guest"}</div>
                         <div className="text-xs text-muted-foreground">{order.customer_phone || ""}</div>
                       </td>
-                      <td className="px-4 py-3 text-muted-foreground">{order.delivery_area_name || "—"}</td>
-                      <td className="px-4 py-3 text-muted-foreground">
+                      <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{order.delivery_area_name || "—"}</td>
+                      <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">
                         {order.items.slice(0, 2).map((item: any) => `${item.quantity}x ${item.product_name}`).join(", ")}
                         {order.items.length > 2 && ` +${order.items.length - 2} more`}
                       </td>
-                      <td className="px-4 py-3 text-muted-foreground">{order.payment_method || "COD"}</td>
-                      <td className="px-4 py-3 font-semibold">&#x20B9;{order.total}</td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{order.payment_method || "COD"}</td>
+                      <td className="px-4 py-3 font-semibold whitespace-nowrap">&#x20B9;{order.total}</td>
+                      <td className="px-4 py-3 whitespace-nowrap">
                         <Select
                           value={order.status}
                           onValueChange={val => updateStatus.mutate({ id: order.id, data: { status: val } })}
                         >
-                          <SelectTrigger className={`h-8 text-xs font-semibold border w-36 ${STATUS_COLORS[order.status] || ""}`} data-testid={`select-status-${order.id}`}>
+                          <SelectTrigger className={`h-8 text-xs font-semibold border w-[8.5rem] sm:w-36 ${STATUS_COLORS[order.status] || ""}`} data-testid={`select-status-${order.id}`}>
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>

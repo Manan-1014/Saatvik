@@ -161,6 +161,7 @@ export interface OrderWithItems {
   total: string;
   status: string;
   payment_method?: string | null;
+  fulfillment_type: "DELIVERY" | "TAKE_AWAY" | "DINE_IN";
   order_time: string;
   delivery_date?: string | null;
   items: OrderItem[];
@@ -169,6 +170,7 @@ export interface OrderWithItems {
 export interface OrderTrack {
   id: number;
   status: string;
+  fulfillment_type: "DELIVERY" | "TAKE_AWAY" | "DINE_IN";
   order_time: string;
   delivery_date?: string | null;
   delivery_area_name?: string | null;
@@ -177,7 +179,8 @@ export interface OrderTrack {
 }
 
 export interface CreateOrderBody {
-  delivery_area_id: number;
+  fulfillment_type: "DELIVERY" | "TAKE_AWAY" | "DINE_IN";
+  delivery_area_id?: number;
   payment_method: string;
 }
 

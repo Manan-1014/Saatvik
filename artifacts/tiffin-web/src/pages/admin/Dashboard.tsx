@@ -31,21 +31,21 @@ export default function Dashboard() {
   return (
     <AdminLayout>
       <div data-testid="admin-dashboard">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "Poppins, sans-serif" }}>Dashboard</h1>
             <p className="text-sm text-muted-foreground">{new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</p>
           </div>
-          <span className="text-xs font-medium text-green-600 bg-green-50 px-3 py-1 rounded-full border border-green-200">Live</span>
+          <span className="self-start sm:self-auto text-xs font-medium text-green-600 bg-green-50 px-3 py-1 rounded-full border border-green-200">Live</span>
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+        <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
           {isLoading ? (
             Array.from({ length: 6 }).map((_, i) => <div key={i} className="bg-card border border-card-border rounded-xl p-4 animate-pulse h-24" />)
           ) : (
             statCards.map(card => (
-              <div key={card.label} className="bg-card border border-card-border rounded-xl p-4" data-testid={`stat-${card.label.toLowerCase().replace(/\s+/g, "-")}`}>
+              <div key={card.label} className="bg-card border border-card-border rounded-xl p-3 sm:p-4" data-testid={`stat-${card.label.toLowerCase().replace(/\s+/g, "-")}`}>
                 <div className="flex items-center justify-between mb-2">
                   <card.icon className={`w-5 h-5 ${card.color}`} />
                   <span className="text-xs text-muted-foreground">{card.trend}</span>
@@ -137,27 +137,27 @@ export default function Dashboard() {
               <Link to="/admin/orders" className="text-xs text-primary font-medium hover:underline">View All</Link>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[760px] text-sm">
                 <thead>
                   <tr className="border-b border-border">
-                    <th className="text-left pb-2 text-xs font-medium text-muted-foreground">Customer</th>
-                    <th className="text-left pb-2 text-xs font-medium text-muted-foreground">Area</th>
-                    <th className="text-left pb-2 text-xs font-medium text-muted-foreground">Items</th>
-                    <th className="text-left pb-2 text-xs font-medium text-muted-foreground">Total</th>
-                    <th className="text-left pb-2 text-xs font-medium text-muted-foreground">Status</th>
+                    <th className="text-left pb-2 text-xs font-medium text-muted-foreground whitespace-nowrap">Customer</th>
+                    <th className="text-left pb-2 text-xs font-medium text-muted-foreground whitespace-nowrap">Area</th>
+                    <th className="text-left pb-2 text-xs font-medium text-muted-foreground whitespace-nowrap">Items</th>
+                    <th className="text-left pb-2 text-xs font-medium text-muted-foreground whitespace-nowrap">Total</th>
+                    <th className="text-left pb-2 text-xs font-medium text-muted-foreground whitespace-nowrap">Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {(stats?.recent_orders ?? []).map((order: any) => (
                     <tr key={order.id} className="border-b border-border/50 last:border-0" data-testid={`recent-order-${order.id}`}>
-                      <td className="py-2.5">
+                      <td className="py-2.5 whitespace-nowrap">
                         <div className="font-medium text-foreground">{order.customer_name || "Guest"}</div>
                         <div className="text-xs text-muted-foreground">ORD{String(order.id).padStart(8, "0")}</div>
                       </td>
-                      <td className="py-2.5 text-muted-foreground">{order.delivery_area_name || "—"}</td>
-                      <td className="py-2.5 text-muted-foreground">{order.items.length}</td>
-                      <td className="py-2.5 font-medium">&#x20B9;{order.total}</td>
-                      <td className="py-2.5">
+                      <td className="py-2.5 text-muted-foreground whitespace-nowrap">{order.delivery_area_name || "—"}</td>
+                      <td className="py-2.5 text-muted-foreground whitespace-nowrap">{order.items.length}</td>
+                      <td className="py-2.5 font-medium whitespace-nowrap">&#x20B9;{order.total}</td>
+                      <td className="py-2.5 whitespace-nowrap">
                         <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${STATUS_COLORS[order.status] || "bg-gray-100 text-gray-700"}`}>
                           {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                         </span>

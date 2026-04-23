@@ -19,6 +19,7 @@ import { useToast } from "@/hooks/use-toast";
 const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID as string;
 
 type CheckoutStep = 1 | 2 | 3;
+type FulfillmentType = "DELIVERY" | "TAKE_AWAY" | "DINE_IN";
 
 /** Backend response from POST /api/payment/create-order */
 interface CreatePaymentOrderResponse {
@@ -53,6 +54,7 @@ export default function Cart() {
   const { isAuthenticated, user, token } = useAuth();
   const [, setLocation] = useLocation();
   const [selectedArea, setSelectedArea] = useState<string>("");
+  const [fulfillmentType, setFulfillmentType] = useState<FulfillmentType>("DELIVERY");
   const [paymentMethod, setPaymentMethod] = useState("COD");
   const [checkoutStep, setCheckoutStep] = useState<CheckoutStep>(1);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
@@ -76,8 +78,9 @@ export default function Cart() {
     },
   });
 
+  const isDeliveryOrder = fulfillmentType === "DELIVERY";
   const selectedAreaData = areas?.find((a) => a.id.toString() === selectedArea);
-  const deliveryCharge = selectedAreaData ? parseFloat(selectedAreaData.delivery_charge as string) : 0;
+  const deliveryCharge = isDeliveryOrder && selectedAreaData ? parseFloat(selectedAreaData.delivery_charge as string) : 0;
   const subtotal = parseFloat(cart?.subtotal || "0");
   const total = subtotal + deliveryCharge;
   const amountPaise = Math.round(total * 100);
@@ -230,14 +233,15 @@ export default function Cart() {
 
   /** Razorpay: server creates Razorpay order from cart; app order is created only after /payment/verify succeeds. */
   async function handleRazorpayPayNow() {
-    if (!selectedArea || !token) return;
+    if ((isDeliveryOrder && !selectedArea) || !token) return;
     setPaymentUiError(null);
     setIsProcessingPayment(true);
     try {
       const { ok, status, data } = await apiPostJson<CreatePaymentOrderResponse & { error?: string }>(
         "/payment/create-order",
         {
-          delivery_area_id: parseInt(selectedArea, 10),
+          fulfillment_type: fulfillmentType,
+          delivery_area_id: isDeliveryOrder ? parseInt(selectedArea, 10) : undefined,
           amount: amountPaise,
         },
         token,
@@ -256,18 +260,19 @@ export default function Cart() {
   }
 
   function handleCodCheckout() {
-    if (!selectedArea) return;
+    if (isDeliveryOrder && !selectedArea) return;
     setIsProcessingPayment(true);
     createOrder.mutate({
       data: {
-        delivery_area_id: parseInt(selectedArea, 10),
+        fulfillment_type: fulfillmentType,
+        delivery_area_id: isDeliveryOrder ? parseInt(selectedArea, 10) : undefined,
         payment_method: paymentMethod,
       },
     });
   }
 
   function goNext() {
-    if (checkoutStep === 1 && !selectedArea) return;
+    if (checkoutStep === 1 && isDeliveryOrder && !selectedArea) return;
     setCheckoutStep((s) => (s < 3 ? ((s + 1) as CheckoutStep) : s));
   }
   function goBack() {
@@ -377,7 +382,7 @@ export default function Cart() {
               {/* Step indicator */}
               <div className="flex items-center justify-between gap-1 text-xs font-medium text-muted-foreground">
                 {[
-                  { n: 1 as CheckoutStep, label: "Delivery" },
+                  { n: 1 as CheckoutStep, label: "Fulfilment" },
                   { n: 2 as CheckoutStep, label: "Summary" },
                   { n: 3 as CheckoutStep, label: "Payment" },
                 ].map(({ n, label }) => (
@@ -400,20 +405,39 @@ export default function Cart() {
 
               {checkoutStep === 1 && (
                 <div>
-                  <h2 className="font-semibold text-foreground mb-3">Delivery area</h2>
-                  <p className="text-sm text-muted-foreground mb-3">Choose where we should deliver your order.</p>
-                  <Select value={selectedArea} onValueChange={setSelectedArea}>
+                  <h2 className="font-semibold text-foreground mb-3">Order type</h2>
+                  <p className="text-sm text-muted-foreground mb-3">Choose how you want to receive the order.</p>
+                  <Select value={fulfillmentType} onValueChange={(value: FulfillmentType) => setFulfillmentType(value)}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select area..." />
+                      <SelectValue placeholder="Select order type..." />
                     </SelectTrigger>
                     <SelectContent>
-                      {areas?.map((area) => (
-                        <SelectItem key={area.id} value={area.id.toString()} data-testid={`option-area-${area.id}`}>
-                          {area.name} (+&#x20B9;{area.delivery_charge})
-                        </SelectItem>
-                      ))}
+                      <SelectItem value="DELIVERY">Delivery</SelectItem>
+                      <SelectItem value="TAKE_AWAY">Take Away</SelectItem>
+                      <SelectItem value="DINE_IN">Dine In</SelectItem>
                     </SelectContent>
                   </Select>
+                  {isDeliveryOrder ? (
+                    <div className="mt-4">
+                      <label className="text-sm font-medium text-foreground mb-2 block">Delivery area</label>
+                      <Select value={selectedArea} onValueChange={setSelectedArea}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select area..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {areas?.map((area) => (
+                            <SelectItem key={area.id} value={area.id.toString()} data-testid={`option-area-${area.id}`}>
+                              {area.name} (+&#x20B9;{area.delivery_charge})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  ) : (
+                    <p className="mt-4 text-sm text-muted-foreground">
+                      No delivery charge will be applied for {fulfillmentType === "TAKE_AWAY" ? "Take Away" : "Dine In"} orders.
+                    </p>
+                  )}
                 </div>
               )}
 
@@ -512,7 +536,7 @@ export default function Cart() {
                     type="button"
                     className="flex-1 bg-primary text-white"
                     onClick={goNext}
-                    disabled={checkoutStep === 1 && !selectedArea}
+                    disabled={checkoutStep === 1 && isDeliveryOrder && !selectedArea}
                   >
                     Next
                     <ChevronRight className="w-4 h-4 ml-1" />
@@ -521,7 +545,7 @@ export default function Cart() {
                   <Button
                     type="button"
                     className="flex-1 bg-primary text-white"
-                    disabled={!selectedArea || isCheckoutBusy}
+                    disabled={(isDeliveryOrder && !selectedArea) || isCheckoutBusy}
                     onClick={handleRazorpayPayNow}
                     data-testid="btn-checkout"
                   >
@@ -541,7 +565,7 @@ export default function Cart() {
                   <Button
                     type="button"
                     className="flex-1 bg-primary text-white"
-                    disabled={!selectedArea || isCheckoutBusy || createOrder.isPending}
+                    disabled={(isDeliveryOrder && !selectedArea) || isCheckoutBusy || createOrder.isPending}
                     onClick={handleCodCheckout}
                     data-testid="btn-checkout"
                   >

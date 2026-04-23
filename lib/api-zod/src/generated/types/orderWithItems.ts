@@ -19,6 +19,7 @@ export interface OrderWithItems {
   total: string;
   status: string;
   payment_method?: string | null;
+  fulfillment_type: "DELIVERY" | "TAKE_AWAY" | "DINE_IN";
   order_time: Date;
   delivery_date?: string | null;
   items: OrderItem[];

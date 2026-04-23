@@ -4,20 +4,31 @@ import { getRazorpayKeyId } from "../config/razorpay";
 import { createRazorpayCheckout, verifyRazorpayAndCreateOrder } from "../services/paymentService";
 import { eq } from "drizzle-orm";
 import { db, ordersTable, paymentsTable } from "@workspace/db";
+import type { FulfillmentType } from "../services/paymentService";
 
 /**
  * POST /api/payment/create-order
  * Body: { delivery_area_id: number, amount?: number } — amount is total in paise (optional cross-check).
  */
 export async function postCreateOrder(req: AuthRequest, res: Response): Promise<void> {
-  const { delivery_area_id, amount } = req.body as { delivery_area_id?: number; amount?: number };
+  const { delivery_area_id, amount, fulfillment_type } = req.body as {
+    delivery_area_id?: number;
+    amount?: number;
+    fulfillment_type?: FulfillmentType;
+  };
+  const selectedFulfillmentType: FulfillmentType = fulfillment_type ?? "DELIVERY";
 
-  if (delivery_area_id == null || typeof delivery_area_id !== "number") {
-    res.status(400).json({ error: "delivery_area_id is required and must be a number" });
+  if (!["DELIVERY", "TAKE_AWAY", "DINE_IN"].includes(selectedFulfillmentType)) {
+    res.status(400).json({ error: "fulfillment_type must be DELIVERY, TAKE_AWAY, or DINE_IN" });
     return;
   }
 
-  const result = await createRazorpayCheckout(req.user!.id, delivery_area_id, amount);
+  if (selectedFulfillmentType === "DELIVERY" && (delivery_area_id == null || typeof delivery_area_id !== "number")) {
+    res.status(400).json({ error: "delivery_area_id is required and must be a number for delivery orders" });
+    return;
+  }
+
+  const result = await createRazorpayCheckout(req.user!.id, selectedFulfillmentType, delivery_area_id, amount);
 
   if (!result.ok) {
     // `from: "api"` helps tell this JSON apart from an empty/HTML 502 from the Vite proxy when the API is unreachable.

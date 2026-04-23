@@ -59,9 +59,9 @@ export default function Menu() {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-2" style={{ fontFamily: "Poppins, sans-serif" }}>Our Menu</h1>
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-10 lg:px-8 lg:py-12">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="mb-2 text-3xl font-bold text-foreground sm:text-4xl" style={{ fontFamily: "Poppins, sans-serif" }}>Our Menu</h1>
           <p className="text-muted-foreground">Every item is prepared fresh daily — strictly no onion, garlic, or root vegetables.</p>
           <p className="text-sm text-primary font-medium mt-2">
             Showing menu for: {formatMenuDateLabel(selectedMenuDate)}
@@ -84,32 +84,29 @@ export default function Menu() {
           <Button
             variant={availableOnly ? "default" : "outline"}
             onClick={() => setAvailableOnly(!availableOnly)}
-            className={availableOnly ? "bg-primary text-white" : ""}
+            className={`${availableOnly ? "bg-primary text-white" : ""} w-full sm:w-auto`}
             data-testid="btn-available-only"
           >
             Available Only
           </Button>
-          <div className="flex items-center gap-2">
-            <label htmlFor="menu-date" className="text-sm text-muted-foreground whitespace-nowrap">
-              Menu date
-            </label>
+     
             <Input
               id="menu-date"
               type="date"
               min={todayIsoDate()}
               value={selectedMenuDate}
               onChange={(e) => setSelectedMenuDate(e.target.value)}
-              className="w-[180px]"
+              className="w-full"
               data-testid="input-menu-date"
             />
-          </div>
+       
         </div>
 
         {/* Category Pills */}
-        <div className="flex flex-wrap gap-2 mb-8">
+        <div className="-mx-4 mb-6 flex gap-2 overflow-x-auto whitespace-nowrap px-4 pb-1 sm:mx-0 sm:mb-8 sm:px-0">
           <button
             onClick={() => setSelectedCategory(undefined)}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${!selectedCategory ? "bg-primary text-white" : "bg-card border border-border text-foreground hover:bg-muted"}`}
+            className={`shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-colors ${!selectedCategory ? "bg-primary text-white" : "bg-card border border-border text-foreground hover:bg-muted"}`}
             data-testid="category-all"
           >
             All Items {products && `(${products.length})`}
@@ -118,7 +115,7 @@ export default function Menu() {
             <button
               key={cat.id}
               onClick={() => setSelectedCategory(selectedCategory === cat.id ? undefined : cat.id)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${selectedCategory === cat.id ? "bg-primary text-white" : "bg-card border border-border text-foreground hover:bg-muted"}`}
+              className={`shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-colors ${selectedCategory === cat.id ? "bg-primary text-white" : "bg-card border border-border text-foreground hover:bg-muted"}`}
               data-testid={`category-${cat.id}`}
             >
               {cat.name}
@@ -133,7 +130,7 @@ export default function Menu() {
         </div>
 
         {isLoading ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {Array.from({ length: 8 }).map((_, i) => (
               <div key={i} className="bg-card rounded-2xl overflow-hidden animate-pulse">
                 <div className="h-48 bg-muted" />
@@ -146,7 +143,7 @@ export default function Menu() {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {filtered.map(product => (
               <div key={product.id} className="bg-card border border-card-border rounded-2xl overflow-hidden hover:shadow-lg transition-shadow group" data-testid={`card-product-${product.id}`}>
                 <div className="relative h-48 overflow-hidden">
@@ -172,17 +169,17 @@ export default function Menu() {
                   {product.description && (
                     <p className="text-xs text-muted-foreground mb-3 line-clamp-2">{product.description}</p>
                   )}
-                  <div className="flex items-center justify-between">
-                    <span className="text-lg font-bold text-primary" data-testid={`text-price-${product.id}`}>&#x20B9;{product.price}</span>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-lg font-bold text-primary whitespace-nowrap" data-testid={`text-price-${product.id}`}>&#x20B9;{product.price}</span>
                     <Button
                       size="sm"
-                      className="bg-primary hover:bg-primary/90 text-white text-xs h-8"
+                      className="h-8 min-w-0 bg-primary px-3 text-xs text-white hover:bg-primary/90"
                       disabled={product.stock === 0 || addToCart.isPending}
                       onClick={() => handleAddToCart(product.id)}
                       data-testid={`btn-add-to-cart-${product.id}`}
                     >
-                      <ShoppingCart className="w-3 h-3 mr-1" />
-                      Add to Cart
+                      <ShoppingCart className="mr-1 h-3 w-3 shrink-0" />
+                      <span className="truncate">Add to Cart</span>
                     </Button>
                   </div>
                 </div>

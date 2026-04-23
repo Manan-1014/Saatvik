@@ -1549,6 +1549,9 @@ components:
         payment_method:
           type: string
           nullable: true
+        fulfillment_type:
+          type: string
+          enum: [DELIVERY, TAKE_AWAY, DINE_IN]
         order_time:
           type: string
           format: date-time
@@ -1566,6 +1569,7 @@ components:
         - subtotal
         - total
         - status
+        - fulfillment_type
         - order_time
         - items
 
@@ -1585,6 +1589,9 @@ components:
         delivery_area_name:
           type: string
           nullable: true
+        fulfillment_type:
+          type: string
+          enum: [DELIVERY, TAKE_AWAY, DINE_IN]
         items:
           type: array
           items:
@@ -1594,6 +1601,7 @@ components:
       required:
         - id
         - status
+        - fulfillment_type
         - order_time
         - items
         - total
@@ -1601,12 +1609,15 @@ components:
     CreateOrderBody:
       type: object
       properties:
+        fulfillment_type:
+          type: string
+          enum: [DELIVERY, TAKE_AWAY, DINE_IN]
         delivery_area_id:
           type: integer
         payment_method:
           type: string
       required:
-        - delivery_area_id
+        - fulfillment_type
         - payment_method
 
     UpdateOrderStatusBody:

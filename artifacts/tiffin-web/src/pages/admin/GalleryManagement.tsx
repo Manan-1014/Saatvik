@@ -115,7 +115,7 @@ export default function GalleryManagement() {
   return (
     <AdminLayout>
       <div data-testid="admin-gallery">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-foreground flex items-center gap-2" style={{ fontFamily: "Poppins, sans-serif" }}>
               <Images className="w-7 h-7 text-primary" />
@@ -123,7 +123,7 @@ export default function GalleryManagement() {
             </h1>
             <p className="text-sm text-muted-foreground mt-1">Add image URLs with a title and optional description.</p>
           </div>
-          <Button className="bg-primary hover:bg-primary/90 text-white" onClick={() => openModal()}>
+          <Button className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white" onClick={() => openModal()}>
             <Plus className="w-4 h-4 mr-2" />
             Add photo
           </Button>
@@ -134,39 +134,39 @@ export default function GalleryManagement() {
             <div className="p-8 text-center text-muted-foreground">Loading…</div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[920px] text-sm">
                 <thead className="bg-muted/40">
                   <tr>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground w-20">Preview</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Name</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Description</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Sort</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Status</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Actions</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground whitespace-nowrap w-20">Preview</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Name</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Description</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Sort</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Status</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {rows?.map((r) => (
                     <tr key={r.id} className="border-t border-border/50">
-                      <td className="px-4 py-2">
+                      <td className="px-4 py-2 whitespace-nowrap">
                         <img src={r.imageUrl} alt="" className="w-14 h-14 rounded-lg object-cover bg-muted" />
                       </td>
-                      <td className="px-4 py-3 font-medium text-foreground max-w-[140px] truncate">{r.name}</td>
+                      <td className="px-4 py-3 font-medium text-foreground max-w-[140px] truncate whitespace-nowrap">{r.name}</td>
                       <td className="px-4 py-3 text-muted-foreground max-w-[200px] truncate">{r.description || "—"}</td>
-                      <td className="px-4 py-3 text-muted-foreground">{r.sortOrder}</td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{r.sortOrder}</td>
+                      <td className="px-4 py-3 whitespace-nowrap">
                         <span
                           className={`text-xs px-2 py-1 rounded-full ${r.status === 1 ? "bg-green-100 text-green-800" : r.status === 2 ? "bg-muted text-muted-foreground" : "bg-amber-100 text-amber-800"}`}
                         >
                           {r.status === 1 ? "Live" : r.status === 2 ? "Deleted" : "Hidden"}
                         </span>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 whitespace-nowrap">
                         <div className="flex gap-2">
-                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openModal(r)} disabled={r.status === 2}>
+                          <Button variant="ghost" size="icon" className="h-9 w-9 sm:h-8 sm:w-8" onClick={() => openModal(r)} disabled={r.status === 2}>
                             <Pencil className="w-3.5 h-3.5" />
                           </Button>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => deleteMut.mutate({ id: r.id })} disabled={r.status === 2}>
+                          <Button variant="ghost" size="icon" className="h-9 w-9 sm:h-8 sm:w-8 text-destructive" onClick={() => deleteMut.mutate({ id: r.id })} disabled={r.status === 2}>
                             <Trash2 className="w-3.5 h-3.5" />
                           </Button>
                         </div>
@@ -258,11 +258,11 @@ export default function GalleryManagement() {
                     </FormItem>
                   )}
                 />
-                <div className="flex justify-end gap-2 pt-2">
-                  <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2">
+                  <Button type="button" variant="outline" onClick={() => setOpen(false)} className="w-full sm:w-auto">
                     Cancel
                   </Button>
-                  <Button type="submit" className="bg-primary text-white" disabled={createMut.isPending || updateMut.isPending}>
+                  <Button type="submit" className="w-full sm:w-auto bg-primary text-white" disabled={createMut.isPending || updateMut.isPending}>
                     Save
                   </Button>
                 </div>
