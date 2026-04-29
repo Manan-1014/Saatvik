@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "sh -c 'export NODE_ENV=development; export PORT=\"${PORT:-${API_PORT:-3001}}\"; echo \"[api] tsx watch — PORT=$PORT (set API_PORT in .env)\"; exec tsx watch src/index.ts'",
+"dev": "cross-env NODE_ENV=development PORT=%API_PORT% tsx watch src/index.ts",
     "build": "node ./build.mjs",
     "start": "node --enable-source-maps ./dist/index.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit"

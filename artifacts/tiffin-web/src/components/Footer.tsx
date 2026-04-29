@@ -180,8 +180,9 @@ export function Footer() {
               <li className="flex gap-3 text-white/80">
                 <Clock className="w-5 h-5 text-primary shrink-0 mt-0.5" />
                 <div>
-                  <div>Lunch: 11 AM – 2 PM</div>
-                  <div>Nasta: 4 PM – 7 PM</div>
+                  <div>Lunch: 9 AM – 1 PM</div>
+                  <div>Nasta: 3 PM – 5 PM</div>
+                  <div>Dinner: 4 PM – 6:30 PM</div>
                   <div className="text-xs text-white/50 mt-1">Order cutoff: {cutoff}</div>
                 </div>
               </li>

@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "sh -c 'export PORT=\"${PORT:-${WEB_PORT:-3000}}\"; export API_SERVER_URL=\"${API_SERVER_URL:-http://localhost:${API_PORT:-3001}}\"; exec vite --config vite.config.ts --host 0.0.0.0'",
-    "build": "vite build --config vite.config.ts",
+"dev": "cross-env PORT=%WEB_PORT% API_SERVER_URL=http://localhost:%API_PORT% vite", 
+"build": "vite build --config vite.config.ts",
     "serve": "vite preview --config vite.config.ts --host 0.0.0.0",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },

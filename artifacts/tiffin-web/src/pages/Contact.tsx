@@ -42,9 +42,9 @@ export default function Contact() {
     {
       icon: Phone,
       title: "Call Us",
-      content: settings?.contact_number || "+91 98765 43210",
-      sub: "Mon - Sun, 9 AM - 8 PM",
-      link: `tel:${settings?.contact_number || "+919876543210"}`,
+      content: settings?.contact_number || "+91 86908 57887",
+      sub: "Mon - Sun, 9 AM - 6:30 PM",
+      link: `tel:${settings?.contact_number || "+918690857887"}`,
       linkLabel: "Call Now",
     },
     {
@@ -52,22 +52,22 @@ export default function Contact() {
       title: "WhatsApp",
       content: settings?.contact_number || "+91 98765 43210",
       sub: "Quick replies on WhatsApp",
-      link: `https://wa.me/919876543210`,
+      link: `https://wa.me/918690857887`,
       linkLabel: "Chat Now",
     },
     {
       icon: MapPin,
       title: "Our Kitchen",
-      content: "12, Panchvati Society",
-      sub: "Vastrapur, Ahmedabad - 380 015",
-      link: "https://maps.google.com/?q=Vastrapur+Ahmedabad",
+      content: "Jain Bhavan, Sector-12",
+      sub: "Kharghar, Navi Mumbai - 410 210",
+      link: "https://share.google/oKG8qaFDgW75D9YXt",
       linkLabel: "Get Directions",
     },
     {
       icon: Clock,
       title: "Delivery Hours",
       content: "Lunch: 11 AM - 2 PM",
-      sub: "Nasta: 4 PM - 7 PM",
+      sub: "Dinner: 4 PM - 6:30 PM",
       link: null,
       linkLabel: null,
     },
@@ -107,7 +107,7 @@ export default function Contact() {
           <div className="lg:col-span-3 space-y-6 flex flex-col">
             <div className="bg-card border border-card-border rounded-3xl overflow-hidden shadow-sm flex-1 min-h-[400px]">
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3672.2!2d72.535!3d23.027!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjPCsDAxJzM3LjIiTiA3MsKwMzInMDYuMCJF!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3771.461781172211!2d73.0629020756822!3d19.043424052993398!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7c3006ee5fcd1%3A0x1eacfd7a2cedaa6!2sJain%20Bhavan%20Satvik%20Aahar%20aium%20Niwas%20Gruh!5e0!3m2!1sen!2sin!4v1777476614565!5m2!1sen!2sin%22%20width=%22600%22%20height=%22450%22%20style=%22border:0;%22%20allowfullscreen=%22%22%20loading=%22lazy%22%20referrerpolicy=%22no-referrer-when-downgrade"
                 className="w-full h-full min-h-[400px]"
                 style={{ border: 0 }}
                 allowFullScreen
@@ -142,8 +142,8 @@ export default function Contact() {
                          <MapPin className="w-5 h-5 text-orange-600" />
                       </div>
                       <div>
-                         <p className="font-medium text-foreground">12, Panchvati Society</p>
-                         <p className="text-sm text-muted-foreground">Vastrapur, Ahmedabad - 380 015</p>
+                         <p className="font-medium text-foreground">Jain Bhavan, Sector -12</p>
+                         <p className="text-sm text-muted-foreground">Kharghar, Navi Mumbai - 410 210</p>
                       </div>
                    </div>
                    <div className="flex items-start gap-4">
@@ -152,7 +152,7 @@ export default function Contact() {
                       </div>
                       <div>
                          <p className="font-medium text-foreground">{settings?.contact_number || "+91 98765 43210"}</p>
-                         <p className="text-sm text-muted-foreground">Mon - Sun, 9 AM - 8 PM</p>
+                         <p className="text-sm text-muted-foreground">Mon - Sun, 9 AM - 6:30 PM</p>
                       </div>
                    </div>
                    <div className="flex items-start gap-4">
@@ -160,7 +160,7 @@ export default function Contact() {
                          <Mail className="w-5 h-5 text-orange-600" />
                       </div>
                       <div>
-                         <p className="font-medium text-foreground">hello@saatvikaahargruh.com</p>
+                         <p className="font-medium text-foreground">satvikahargrah12@gmail.com</p>
                          <p className="text-sm text-muted-foreground">We reply within 24 hours</p>
                       </div>
                    </div>
@@ -169,18 +169,18 @@ export default function Contact() {
                 <div className="pt-6 border-t border-border">
                    <h3 className="font-medium text-foreground mb-4">Follow Us</h3>
                    <div className="flex gap-3">
-                      <a href="#" className="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-colors duration-300">
+                      {/* <a href="#" className="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-colors duration-300">
                          <Facebook className="w-5 h-5" />
-                      </a>
-                      <a href="#" className="w-10 h-10 rounded-full bg-pink-50 text-pink-600 flex items-center justify-center hover:bg-pink-600 hover:text-white transition-colors duration-300">
+                      </a> */}
+                      <a href="https://www.instagram.com/satvikahargruh/" className="w-10 h-10 rounded-full bg-pink-50 text-pink-600 flex items-center justify-center hover:bg-pink-600 hover:text-white transition-colors duration-300">
                          <Instagram className="w-5 h-5" />
                       </a>
-                      <a href="#" className="w-10 h-10 rounded-full bg-sky-50 text-sky-600 flex items-center justify-center hover:bg-sky-500 hover:text-white transition-colors duration-300">
+                      {/* <a href="#" className="w-10 h-10 rounded-full bg-sky-50 text-sky-600 flex items-center justify-center hover:bg-sky-500 hover:text-white transition-colors duration-300">
                          <Twitter className="w-5 h-5" />
-                      </a>
-                      <a href="#" className="w-10 h-10 rounded-full bg-green-50 text-green-600 flex items-center justify-center hover:bg-green-600 hover:text-white transition-colors duration-300">
+                      </a> */}
+                      {/* <a href="#" className="w-10 h-10 rounded-full bg-green-50 text-green-600 flex items-center justify-center hover:bg-green-600 hover:text-white transition-colors duration-300">
                          <MessageSquare className="w-5 h-5" />
-                      </a>
+                      </a> */}
                    </div>
                 </div>
              </div>

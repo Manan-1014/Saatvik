@@ -91,7 +91,7 @@ export default function SnacksStore() {
           <div className="flex flex-wrap gap-3">
             <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">Fresh stock</span>
             <span className="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm font-medium">Login to cart</span>
-            <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">Free Delivery ₹500+</span>
+            <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">Live Counter</span>
           </div>
         </div>
 

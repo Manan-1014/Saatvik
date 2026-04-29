@@ -143,7 +143,7 @@ export default function Home() {
               </h2>
             </div>
             <p className={`text-lg text-white/80 mb-8 leading-relaxed home-load-anim from-bottom delay-300 ${heroLoaded ? "animated" : ""}`}>
-              Authentic, home-style Jain meals — freshly cooked and delivered to your doorstep every day. No login. No fuss. Just wholesome food.
+              Authentic, home-style Jain meals — freshly cooked and delivered to your doorstep every day. No fuss. Just wholesome food.
             </p>
             <div className={`flex flex-wrap gap-4 mb-12 home-load-anim from-bottom delay-450 ${heroLoaded ? "animated" : ""}`}>
               <Link to="/menu">
@@ -226,7 +226,7 @@ export default function Home() {
               {[
                 { icon: ShieldCheck, text: "Strictly no onion, garlic, or root vegetables" },
                 { icon: Clock, text: "Fresh preparation starts at 7 AM every day" },
-                { icon: Star, text: "Trusted by 500+ families across Ahmedabad" },
+                { icon: Star, text: "Trusted by 500+ families across Navi Mumbai" },
               ].map((item, index) => (
                 <div
                   key={item.text}
