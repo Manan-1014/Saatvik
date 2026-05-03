@@ -6,6 +6,13 @@ import { logger } from "./lib/logger";
 
 const app: Express = express();
 
+// Parse CORS_ORIGINS into an allowlist. Falls back to open (*) only when the
+// var is not set — which should only happen in local dev without a .env.
+const rawOrigins = process.env.CORS_ORIGINS;
+const corsOrigins: string | string[] = rawOrigins
+  ? rawOrigins.split(",").map((o) => o.trim()).filter(Boolean)
+  : "*";
+
 app.use(
   pinoHttp({
     logger,
@@ -25,7 +32,7 @@ app.use(
     },
   }),
 );
-app.use(cors());
+app.use(cors({ origin: corsOrigins, credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

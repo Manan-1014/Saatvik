@@ -18,6 +18,7 @@
     "db:push-force": "dotenv -e .env -- pnpm --filter @workspace/db push-force",
     "db:seed": "dotenv -e .env -- pnpm --filter @workspace/scripts exec tsx ../artifacts/api-server/seed.mjs",
     "db:studio": "dotenv -e .env -- pnpm --filter @workspace/db studio",
+    "start:api": "dotenv -e .env -- sh -c 'PORT=$API_PORT node artifacts/api-server/dist/index.mjs'",
     "build": "pnpm run typecheck && pnpm -r --if-present run build",
     "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck",
     "typecheck:libs": "tsc --build",
