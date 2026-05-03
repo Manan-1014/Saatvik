@@ -6,12 +6,12 @@ import { logger } from "./lib/logger";
 
 const app: Express = express();
 
-// Parse CORS_ORIGINS into an allowlist. Falls back to open (*) only when the
-// var is not set — which should only happen in local dev without a .env.
+// Parse CORS_ORIGINS into an allowlist.
+// When not set, allow all origins but WITHOUT credentials (wildcard + credentials is invalid per CORS spec).
 const rawOrigins = process.env.CORS_ORIGINS;
-const corsOrigins: string | string[] = rawOrigins
+const corsOrigins: string | string[] | undefined = rawOrigins
   ? rawOrigins.split(",").map((o) => o.trim()).filter(Boolean)
-  : "*";
+  : undefined;
 
 app.use(
   pinoHttp({
@@ -32,7 +32,9 @@ app.use(
     },
   }),
 );
-app.use(cors({ origin: corsOrigins, credentials: true }));
+// credentials:true is only safe when an explicit origin allowlist is set.
+// With no allowlist (open dev mode), omit credentials to avoid browser CORS rejection.
+app.use(cors(corsOrigins ? { origin: corsOrigins, credentials: true } : { origin: true, credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
