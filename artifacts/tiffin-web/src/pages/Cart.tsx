@@ -17,6 +17,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 
 const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID as string;
+const API_BASE = (import.meta.env.VITE_API_SERVER_URL ?? "").replace(/\/+$/, "");
 
 type CheckoutStep = 1 | 2 | 3;
 type FulfillmentType = "DELIVERY" | "TAKE_AWAY" | "DINE_IN";
@@ -38,7 +39,7 @@ interface VerifyPaymentResponse {
 }
 
 async function apiPostJson<T>(path: string, body: unknown, token: string): Promise<{ ok: boolean; status: number; data: T }> {
-  const res = await fetch(`/api${path}`, {
+  const res = await fetch(`${API_BASE}/api${path}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
